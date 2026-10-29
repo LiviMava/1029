@@ -6,6 +6,7 @@ let config, selected = 0, run = null, traces = {}, busy = false, busyText = '', 
 const codes = new Map();
 const el = (tag, text, cls) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; };
 const para = (text, cls) => el('p', text, cls);
+const prettyJson = text => { try { return JSON.stringify(JSON.parse(text), null, 2); } catch { return text; } };
 const regionLabel = v => v === 'CN' ? '中国区' : v === 'EU' ? '欧洲区' : v;
 const categoryLabel = v => v === 'STANDARD' ? '普通商品' : v === 'DIGITAL' ? '数字商品' : v;
 async function api(path, method = 'GET', body) {
@@ -72,7 +73,7 @@ const RAW_LEGENDS = {
     output:[['hits','RRF 融合后的候选片段'],['contributions','每个候选在两路中的名次和 RRF 贡献'],['candidateCount','两路去重后的候选数']]},
   rerank:{input:'上一步 RRF 融合结果。',
     output:[['before','重排前的候选'],['hits','重排后的候选，score 是相关性分数'],['scoreType','分数类型（如 RAW_RELEVANCE）'],['model','重排模型名']]},
-  prompt:{input:'intent、order、fulfillment、scope、ranked：前面各步的结果。',
+  prompt:{input:'问题、订单事实、签收与售后状态、适用政策、排序后的候选证据：前面各步的结果。',
     output:[['eligibility','应用规则给出的判断（不等于最终审核结论）'],['evidence','传给模型的政策证据及引用编号'],['messages','system 和 user 两条模型输入消息']]},
   answer:{input:'PromptData：上一步组装好的模型输入。',
     output:[['answer','模型生成的回答正文'],['citations','回答引用的政策证据'],['citationNumbersValid','[n] 引用编号是否越界'],['generationMode','LIVE_CHAT 或 NO_EVIDENCE_NO_MODEL_CALL'],['warning','引用校验的边界说明：只检查编号，不验证内容']]}
@@ -247,19 +248,35 @@ function highlights(trace) {
   } else if(trace.node==='rerank'){
     const c=card(`按相关性重排 · ${out.model || ''}`);hitList(c,out.hits,`${out.scoreType || '相关性'} 分数`);c.append(para('分数反映相关性，不代表政策适用性或答案正确率。','muted'));
   } else if(trace.node==='prompt'){
-    const c=card('规则判断与准备模型输入'),e=out.eligibility;
-    c.append(el('p',`${e.status} · ${e.reason}`,'decision'),para(e.action));
-    if(e.status==='CONDITIONAL'){
-      const table=el('table',undefined,'detail-table');
-      const add=(k,v)=>{const tr=el('tr');tr.append(el('th',k),el('td',v));table.append(tr);};
-      add('已确认',`已签收；签收后经过 ${e.signedDays} 天；适用 ${e.returnDays} 天期限；未申请售后`);
-      add('尚未确认','商品是否完好、是否满足其他政策条件');
-      c.append(para('关键对照：','raw-legend-title'),table);
-      c.append(para('满足已知的申请条件；确认商品完好并满足其他政策条件后，可按页面路径提交申请。提交申请不代表审核通过。'));
-    }
-    c.append(para(`模型输入包含：问题、订单事实、履约状态、规则判断、${out.evidence.length} 条政策证据。`));
-    if(e.returnDays>0)c.append(para('本例中的申请期限来自政策的结构化字段 returnDays，不是由语言模型从条款中提取。政策正文用于检索、解释和引用。','muted'));
-    c.append(para('规则判断由应用代码执行，同样的输入会得到同样的结果；商品是否完好等未知条件仍需核实。','muted'));
+    const c=card('规则判断与准备模型输入'),e=out.eligibility,input=trace.input||{};
+    const order=input.order||{},live=input.fulfillment||{},scope=input.scope||{},intent=input.intent||{};
+    const blocks=el('div',undefined,'block-grid');
+    const block=(label,value,detail)=>{
+      const b=el('div',undefined,'block');
+      b.append(el('span',label,'block-label'),el('span',value,'block-value'));
+      if(detail)b.append(el('span',detail,'block-detail'));
+      blocks.append(b);
+    };
+    block('问题',intent.question||'—');
+    block('订单事实',`${order.id??'—'} · ${regionLabel(order.region)} · ${categoryLabel(order.category)} · 购买 ${order.purchasedAt||'—'}`);
+    block('签收与售后',`${live.status==='DELIVERED'?'已签收':live.status==='IN_TRANSIT'?'仍在运输':live.status||'—'} · ${live.signedAt||'—'} · ${live.afterSaleOpen?'已申请售后':'未申请售后'}`);
+    block('适用政策',`${(scope.allowedDocumentIds||[]).join('、')||'—'}${e.returnDays>0?` · returnDays ${e.returnDays} 天`:''}`);
+    block('规则判断',`${e.status} · ${e.reason}`,e.action);
+    block('政策证据',`${out.evidence.length} 条`,out.evidence.map((h,i)=>`[${i+1}] ${h.section||h.documentId}`).join(' '));
+    c.append(para('输入块（已有）','raw-legend-title'),blocks);
+    const assembly=el('div',undefined,'assembly');
+    const userRow=el('div',undefined,'assembly-row');
+    ['问题','订单事实','签收与售后','规则判断','政策证据'].forEach(x=>userRow.append(el('span',x,'assembly-chip')));
+    assembly.append(el('span','system 指令','assembly-chip'),el('span','+','assembly-arrow'),userRow,el('span',`→ ${(out.messages||[]).length} 条消息`,'assembly-arrow'));
+    c.append(para('拼接示意','raw-legend-title'),assembly);
+    c.append(para('组装结果（得到）','raw-legend-title'));
+    const messages=el('div',undefined,'assembled-messages');
+    (out.messages||[]).forEach(m=>{
+      const box=el('div',undefined,'assembled-message');
+      box.append(el('span',m.role,'assembled-role'),el('pre',m.role==='user'?prettyJson(m.content):m.content,'assembled-content'));
+      messages.append(box);
+    });
+    c.append(messages);
   } else if(trace.node==='answer'){
     const c=card('生成带引用的回答');c.append(el('div',out.answer,'answer'),para(out.warning,'muted'));
   }
