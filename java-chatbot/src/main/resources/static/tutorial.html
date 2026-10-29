@@ -10,7 +10,7 @@
   <div class="map-lanes"><div><span class="map-tag">实时事实</span><strong>订单 123</strong><span>JDBC + HTTP → 归属 / 签收 / 售后</span></div><span class="map-plus" aria-hidden="true">＋</span><div><span class="map-tag">企业知识</span><strong>退货政策</strong><span>范围过滤 → 检索 → 原文证据</span></div><span class="map-plus" aria-hidden="true">→</span><div><span class="map-tag">有依据的回答</span><strong>能申请？怎么操作？</strong><span>应用规则 → Spring AI → 引用</span></div></div>
   <details><summary>模型为什么不能直接回答？</summary><p>模型没有订单的实时状态，也无法确定企业适用的政策。业务接口提供事实，RAG 提供相关原文，应用规则判断申请资格，模型组织解释。</p></details>
  </section>
- <div class="workspace">
+ <section class="answer-progress"><h2>第二讲：每一种增强，解决一个具体问题</h2><details open><summary>① 快照里没申请售后，但用户刚刚申请了呢？</summary><p>先运行 C–E：提取订单号、验证归属、查询履约状态。业务接口补齐当前事实。这里仍是固定日期的虚构演示数据。</p></details><details><summary>② 找到的退货条款属于别的地区或年份呢？</summary><p>运行 F：依据订单地区、品类、购买日期和发布状态限定政策范围，再检索条款。相似不等于适用。</p></details><details><summary>③ 事实和条款齐了，由谁判断资格？</summary><p>运行 K–L：应用规则判断，模型解释理由与操作步骤。商品完好等未核实条件必须保留。</p></details><details><summary>进阶：怎样找得更全、排得更好？</summary><p>G–J 拆解关键词、向量、融合和重排。这些步骤处理检索质量；它们不能替代事实查询或适用性判断。先理解上述三个问题，再展开排序机制。</p></details></section><div class="workspace">
   <aside class="overview"><div class="overview-heading"><h2>12 步，5 个阶段</h2><span id="progress">第 1 / 12 步</span></div><p class="muted">点击任意一步：先看关键结果；原始数据和实现代码默认收起。</p><div id="pipeline" aria-label="订单检索流水线"></div><p class="muted flow-note">A 的政策原文供 B 建库；B 的检索库供 F 筛选；D 的订单事实用于 F 和 K；E 的签收与售后状态用于 K。</p><div class="navigation"><button id="previous">← 上一步</button><button id="next">下一步 →</button></div><p class="muted boundary">SQL / HTTP 真实执行；订单、履约状态和政策均为虚构。G / H 可并行，演示按顺序执行。只提供建议，不执行售后操作。</p></aside>
   <section class="experiment">
    <p class="scenario-note">选择场景会填入示例问题；本轮订单号以问题中提取的结果为准。</p>
@@ -21,7 +21,7 @@
    <div id="node-detail" hidden>
    <div id="step-flow" class="step-flow" aria-label="当前步骤的数据流"></div>
    <details class="step-why"><summary>为什么需要这一步？</summary><p id="step-why-text"></p></details>
-   <div class="boundary-bar"><span>应用 / 端口</span><strong id="boundary"></strong></div>
+   <details><summary>查看应用与端口</summary><div class="boundary-bar"><span>应用 / 端口</span><strong id="boundary"></strong></div></details>
    <p id="explanation" class="explanation"></p>
    <section class="panel summary-panel"><div class="panel-heading"><span class="summary-label">关键结果</span><h3>先看这一步得到了什么</h3></div><div id="highlights"></div></section>
    <details class="panel raw-panel" id="raw-panel"><summary>原始数据（INPUT / OUTPUT）<span id="timing"></span><span class="muted">默认收起，展开可核对每个字段</span></summary>
