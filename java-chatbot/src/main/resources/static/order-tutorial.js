@@ -460,7 +460,14 @@ function clearResults(){
   $('export').hidden=true;
   renderedIndex=-1;
 }
+function renderProgress(){
+ const box=$('answer-progress');box.replaceChildren();
+ const order=traces.sql?.output,live=traces.api?.output,scope=traces.filter?.output,e=traces.prompt?.output?.eligibility;
+ const rows=[['订单事实',order?`订单 ${order.id} · ${categoryLabel(order.category)}${live?` · 签收日期 ${live.signedAt||'未签收'} · ${live.afterSaleOpen?'已有售后':'未申请售后'}`:''}`:'等待查询订单与履约状态'],['适用政策',scope?`${scope.allowedDocumentIds.length} 份适用，查看筛选依据`:'等待按订单筛选'],['条件判断',e?eligibilityLabel(e.status)+'；'+e.reason:'等待规则判断'],['建议动作',e?e.action:'等待规则与政策证据']];
+ rows.forEach(([k,v])=>box.append(para(k+'：'+v)));
+}
 async function render() {
+  renderProgress();
   document.body.classList.toggle('run-active', !!run);
   $('create').disabled=busy||!!run;
   $('clear').disabled=busy||!run;

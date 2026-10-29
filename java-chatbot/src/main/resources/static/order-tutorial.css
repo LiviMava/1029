@@ -165,3 +165,5 @@ body:not(.run-active) .workspace{display:block;max-width:820px;margin:0 auto;hei
 .intro>div>p:not(.demo-date-note),.intro>.why,.overview>p,.phase-hint,.phase-group-hint,.chip-sub,.scenario-note,#explanation{display:none}
 .summary-panel>.panel-heading{display:none}.boundary-bar{font-size:11px;opacity:.8}.code-panel{border-color:#3a4658}
 @media(max-width:800px){.map-lanes,.step-flow{grid-template-columns:1fr}.map-plus,.flow-arrow{text-align:center;transform:rotate(90deg)}.map-heading{display:block}.map-heading span{display:block;margin-top:6px}}
+
+.answer-progress{border:1px solid #657b91;border-radius:12px;padding:18px;margin:20px 0}.answer-progress h2{font-size:20px}.answer-progress p{line-height:1.7}

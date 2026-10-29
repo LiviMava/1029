@@ -34,7 +34,12 @@ function results(t){$('result').replaceChildren();if(!t){$('result').append(el('
  }
 }
 async function showCode(id){if(!codes.has(id))codes.set(id,await api('/code/'+id));if(steps[selected][0]===id)$('code').textContent=codes.get(id).text;}
-function render(){const s=steps[selected],t=traces[s[0]];
+function renderProgress(){
+ const box=$('answer-progress');box.replaceChildren();
+ const rows=[['订单事实',traces.documents?'已读取订单快照，查看原文核对签收与售后状态':'等待读取订单快照'],['政策依据',traces.search?'已检索到候选；需核对是否支持期限与步骤':'等待检索退货政策'],['条件判断',traces.answer?'见本轮模型回答；商品完好等条件仍需核实':'等待证据与回答'],['操作步骤',traces.answer?'见本轮回答，并对照引用原文核查':'等待政策中的操作路径']];
+ rows.forEach(([k,v])=>box.append(el('p',k+'：'+v)));
+}
+function render(){renderProgress();const s=steps[selected],t=traces[s[0]];
  ['ingest','query'].forEach(id=>$(id).replaceChildren());steps.forEach((s,i)=>{const b=el('button',undefined,(i===selected?'active ':'')+(traces[s[0]]?'done':''));b.append(el('span',traces[s[0]]?'✓':String(i+1).padStart(2,'0'),'step-num'),el('span',s[1]));b.disabled=busy;b.onclick=()=>{selected=i;render();};$(i<5?'ingest':'query').append(b);});
  $('number').textContent=`${selected<5?'建库':'问答'} / ${selected+1} OF 10`;$('title').textContent=s[1];$('reason').textContent=s[5];$('flow').replaceChildren();s.slice(2,5).forEach((v,i)=>{if(i)$('flow').append(el('span','→','flow-arrow'));const b=el('div',undefined,'flow-box');b.append(el('small',['INPUT','JAVA / SERVICE','OUTPUT'][i]),el('strong',v));$('flow').append(b);});
  results(t);$('input').textContent=t?JSON.stringify(t.input,null,2):'等待执行';$('output').textContent=t?JSON.stringify(t.output,null,2):'等待执行';$('timing').textContent=t?`${t.elapsedMs} ms · 真实执行`:'';
