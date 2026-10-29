@@ -11,7 +11,7 @@ const steps=[
  ['store','Milvus 入库','id + vector + text','Milvus · create / insert','独立 collection','向量用于相似度计算；原文与来源保存在动态字段，命中后一起返回。'],
  ['question','问题向量化','用户问题','同一个 Embedding 模型','float[]','问题和文档必须使用同一向量空间。'],
  ['search','向量检索','问题向量','Milvus · COSINE · Top 6','候选原文','用问题向量找相近片段。仅单路向量召回。'],
- ['rerank','重排','问题 + 候选原文','Reranker · Top 6','排序后的证据','重排再次比较问题和原文；分数是相关性，不是答案正确率。'],
+ ['rerank','重排（增强演示）','问题 + 候选原文','Reranker · Top 6','排序后的证据','理解最小 RAG 不需要先掌握重排。本实验保留增强步骤：再次比较问题和原文；分数不是正确率。'],
  ['prompt','拼接 Prompt','问题 + 证据 [n]','system + user','Prompt.messages','把原文放进上下文，模型才有本次回答的依据。'],
  ['answer','生成回答','Prompt','Spring AI · ChatModel.call()','回答 + 引用','按文档快照判断；核查是否回答了“能否申请”和“如何操作”。']
 ];

@@ -492,7 +492,7 @@ async function render() {
   $('explanation').textContent=node.explanation || '';
   $('timing').textContent=trace?`${trace.elapsedMs} ms`:'';
   if(renderedIndex!==selected){
-    $('raw-panel').open=false;$('code-panel').open=true;
+    $('raw-panel').open=false;$('code-panel').open=false;
     $('java-code').textContent='展开后载入当前构建的源码…';$('code-path').textContent='';
     renderedIndex=selected;
   }
