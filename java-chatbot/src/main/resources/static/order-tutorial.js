@@ -29,43 +29,43 @@ function object(parent, value, label = '对象', depth = 0, itemLabel = '') {
   }
 }
 const PHASES = [
-  {label:'原始文档', hint:'先看知识库里有哪些政策文档 · 不调用模型', ids:['documents']},
-  {label:'离线准备', hint:'每个实验开始前建一次 · 智谱 embedding :443 → Qdrant :6333', ids:['prepare']},
-  {label:'① 取业务事实', hint:'Spring Boot :8090 → H2 / 本地 mock HTTP', ids:['question','sql','api']},
-  {label:'② 筛政策 + 检索条款', hint:'应用内规则 / Lucene / Qdrant :6333 / 智谱 rerank :443', ids:['filter','keyword','vector','fusion','rerank']},
-  {label:'③ 判断 + 回答', hint:'应用内规则 → DeepSeek :443', ids:['prompt','answer']}
+  {label:'原始文档', hint:'查看待入库的政策文本及适用条件', ids:['documents']},
+  {label:'离线准备', hint:'为本实验建立政策检索库', ids:['prepare']},
+  {label:'① 取业务事实', hint:'确认订单归属，查询订单与履约状态', ids:['question','sql','api']},
+  {label:'② 筛政策 + 检索条款', hint:'先选适用政策，再查相关条款', ids:['filter','keyword','vector','fusion','rerank']},
+  {label:'③ 判断 + 回答', hint:'应用规则给出判断，模型组织解释', ids:['prompt','answer']}
 ];
-const SUBTITLES = {documents:'5 份政策 → 文档清单',prepare:'5 份政策 → 知识库',question:'问题 → 订单号',sql:'订单号 → 订单事实（SQL）',api:'订单号 → 履约状态（HTTP）',filter:'5 份政策 → 1 份适用',keyword:'BM25 关键词候选',vector:'向量候选（Qdrant 过滤）',fusion:'两路候选 → RRF 融合',rerank:'融合候选 → 模型重排',prompt:'规则判断 + 组装 Prompt',answer:'DeepSeek → 回答 + 引用'};
+const SUBTITLES = {documents:'政策原文与适用条件',prepare:'政策文本 → 检索库',question:'问题 → 订单号',sql:'订单号 → 订单事实',api:'订单号 → 签收/售后状态',filter:'5 份政策 → 适用政策',keyword:'适用政策 → 关键词候选',vector:'适用政策 → 语义候选',fusion:'两路候选 → 合并',rerank:'候选 → 相关性排序',prompt:'事实 + 证据 → 规则判断 + 模型输入',answer:'模型输入 → 回答 + 引用'};
 const RAW_LABELS = {
   documents:['读取参数（无文档输入）','Policy[]（5 份政策文档）'],
   prepare:['5 份政策文档（Policy[]）','建库结果（Knowledge：结构化 + 向量）'],
   question:['问题与演示用户','Intent（解析结果）'],
   sql:['Intent + SQL + 参数','Order（订单事实）'],
-  api:['Order + 请求 URL','Fulfillment（履约状态）'],
-  filter:['Order + Policy[]','Scope（适用政策范围）'],
+  api:['Order + 请求 URL','Fulfillment（签收与售后状态）'],
+  filter:['Order + Policy[]','Scope（适用政策）'],
   keyword:['Scope + Query','Recall（关键词候选）'],
-  vector:['Scope + Query','Recall（向量候选）'],
-  fusion:['两路 Recall','TutorialFusion.Result（融合结果）'],
-  rerank:['融合结果','Ranking（重排结果）'],
-  prompt:['事实 + 证据','PromptData（Prompt 数据）'],
+  vector:['Scope + Query','Recall（语义候选）'],
+  fusion:['两路 Recall','TutorialFusion.Result（合并结果）'],
+  rerank:['合并结果','Ranking（相关性排序）'],
+  prompt:['事实 + 证据','PromptData（规则判断 + 模型输入）'],
   answer:['PromptData','Answer（回答与引用）']
 };
 const RAW_LEGENDS = {
-  documents:{input:'这一步不需要外部输入；直接读取教学内置的政策目录。',
-    output:[['id','政策 ID'],['title','文档标题'],['documentType','文档类型（退货政策 / 退货政策草稿）'],['region','销售地区'],['category','商品类别'],['effectiveFrom / effectiveTo','生效区间'],['published','是否已发布'],['returnDays','可退天数'],['text','政策原文']]},
+  documents:{input:'这一步不需要外部输入；直接读取教学内置的政策目录。政策文本由应用内置，B 步骤写成临时 .md 后解析。',
+    output:[['id','政策 ID'],['title','文档标题'],['documentType','文档类型（退货政策 / 退货政策草稿）'],['region','销售地区'],['category','商品类别'],['effectiveFrom / effectiveTo','生效区间'],['published','是否已发布'],['returnDays','退货申请期限（天）'],['text','政策原文']]},
   prepare:{input:'Policy[]：政策文档数组。每个对象是一份文档，text 是政策原文，title 是文档标题。',
-    note:'Knowledge 是 B 步骤的教学聚合对象，不是 Qdrant 的单条记录：policies/chunks 是结构化文本，points 是 Qdrant 点（vector + payload），database 是集合统计。地区、品类、有效期等筛选元数据在应用侧，不在 Qdrant payload 里。',
-    output:[['policies','政策文档原文（与输入相同，便于对照）'],['chunks','文本片段：id 是片段 ID，documentId 所属政策，chunkIndex 文档内序号，text 原文'],['points','Qdrant 点预览（point = id + vector + payload）：chunkId 对应片段，documentId 所属政策，first8 是向量前 8 维'],['database','Qdrant 集合统计：collection 集合名，pointsCount 点数，dimensions 维度，distance 距离函数']]},
+    note:'Knowledge 是 B 步骤的教学聚合对象，不是 Qdrant 的单条记录：policies/chunks 是结构化文本，points 是 Qdrant 点（vector + payload），database 是集合统计。地区、品类、有效期等筛选元数据在应用侧，不在 Qdrant payload 里。B 只建立向量检索库；G 会在适用政策片段上临时构建 BM25 索引，两路使用相同的片段 ID。',
+    output:[['policies','政策文档原文（与输入相同，便于对照）'],['chunks','文本片段：id 是片段 ID，documentId 所属政策，chunkIndex 文档内序号，text 原文；同一 id 用于关键词和向量两路'],['points','Qdrant 点预览（point = id + vector + payload）：chunkId 对应片段，documentId 所属政策，first8 是向量前 8 维'],['database','Qdrant 集合统计：collection 集合名，pointsCount 点数，dimensions 维度，distance 距离函数']]},
   question:{input:'question：用户原始问题；serverPrincipal：服务端固定的演示用户。',
     output:[['orderId','从问题中提取的订单号'],['customerId','服务端固定的演示用户，不从问题文本采信'],['question','用户原始问题'],['asOf','固定教学日期']]},
   sql:{input:'request：上一步 Intent；sql：代码里写死的参数化 SQL；parameters：订单号和 customerId。',
     output:[['id','订单号'],['region','销售地区'],['category','商品类别'],['model','商品型号'],['purchasedAt','购买日期']]},
   api:{input:'order：订单事实；method：请求方法；url：应用启动的本地 mock 服务地址。',
-    output:[['status','履约状态（DELIVERED/IN_TRANSIT）'],['signedAt','签收日期'],['afterSaleOpen','是否已申请售后'],['source','数据来源说明']]},
+    output:[['status','履约状态：DELIVERED（已签收）/ IN_TRANSIT（仍在运输）'],['signedAt','签收日期'],['afterSaleOpen','是否已申请售后'],['source','数据来源说明']]},
   filter:{input:'order：订单事实；policies：5 份候选政策。',
     output:[['allowedDocumentIds','筛完后适用的政策 ID'],['evaluations','每份政策的纳入/排除原因'],['policyDate','用于选择政策版本的购买日期']]},
   keyword:{input:'scope：适用政策范围；query：检索用问题。',
-    output:[['hits','BM25 命中的片段，score 是关键词分数'],['filter','记录范围过滤条件']]},
+    output:[['hits','BM25 命中的片段，score 是关键词分数；本步骤在适用政策片段上临时建索引'],['filter','记录范围过滤条件']]},
   vector:{input:'scope：适用政策范围；query：检索用问题。',
     output:[['hits','Qdrant 命中的片段，score 是 Cosine 相似度'],['queryVector','问题向量的维度与前 8 维预览'],['filter','Qdrant 的 documentId 过滤条件']]},
   fusion:{input:'keyword 和 vector：两路 Recall 结果。',
@@ -73,9 +73,9 @@ const RAW_LEGENDS = {
   rerank:{input:'上一步 RRF 融合结果。',
     output:[['before','重排前的候选'],['hits','重排后的候选，score 是相关性分数'],['scoreType','分数类型（如 RAW_RELEVANCE）'],['model','重排模型名']]},
   prompt:{input:'intent、order、fulfillment、scope、ranked：前面各步的结果。',
-    output:[['eligibility','应用规则给出的确定性判断'],['evidence','传给模型的政策证据及引用编号'],['messages','system 和 user 两条 Prompt 消息']]},
-  answer:{input:'PromptData：上一步组装好的 Prompt。',
-    output:[['answer','模型生成的回答正文'],['citations','回答引用的政策证据'],['citationNumbersValid','[n] 引用编号是否越界'],['generationMode','LIVE_CHAT 或 NO_EVIDENCE_NO_MODEL_CALL'],['warning','引用校验的边界说明']]}
+    output:[['eligibility','应用规则给出的判断（不等于最终审核结论）'],['evidence','传给模型的政策证据及引用编号'],['messages','system 和 user 两条模型输入消息']]},
+  answer:{input:'PromptData：上一步组装好的模型输入。',
+    output:[['answer','模型生成的回答正文'],['citations','回答引用的政策证据'],['citationNumbersValid','[n] 引用编号是否越界'],['generationMode','LIVE_CHAT 或 NO_EVIDENCE_NO_MODEL_CALL'],['warning','引用校验的边界说明：只检查编号，不验证内容']]}
 };
 function diagram() {
   const wrap = el('div', undefined, 'phase-list');
@@ -133,26 +133,28 @@ function highlights(trace) {
   if(!trace){$('highlights').append(para('运行这一步后，这里先给出关键结果。','object-empty'));return;}
   const out=trace.output;
   if(trace.node==='documents'){
-    const c=card('知识库里的政策原文');
-    c.append(para(`共 ${out.length} 份政策文档。先看每份的地区、品类、有效期和发布状态，再展开原文。`));
+    const c=card('政策原文与适用条件');
+    c.append(para(`共 ${out.length} 份政策文档。先比较地区、年份和发布状态，再展开原文。政策文本由应用内置，B 步骤写成临时 Markdown 后解析。`));
     out.forEach((p,i)=>{
       const d=el('details',undefined,'doc-card');d.open=i===0;
       d.append(el('summary',`${i+1}. 《${p.title}》 · 文档类型：${p.documentType||'政策'} · ${regionLabel(p.region)} · ${categoryLabel(p.category)} · ${p.published?'已发布':'未发布'} · 生效 ${p.effectiveFrom} 至 ${p.effectiveTo}`));
-      d.append(para(`文档 ID：${p.id} · 文档类型：${p.documentType||'政策'} · 解析格式：Markdown（B 步骤写成 .md 后解析） · 可退天数：${p.returnDays}`,'muted'),el('blockquote',p.text,'policy-text'));
+      d.append(para(`政策 ID：${p.id} · 文档类型：${p.documentType||'政策'} · 解析格式：Markdown（B 步骤写成 .md 后解析） · 退货申请期限：${p.returnDays} 天`,'muted'),el('blockquote',p.text,'policy-text'));
       c.append(d);
     });
   } else if(trace.node==='prepare'){
-    const c=card('建好了政策知识库');
-    c.append(para(`${out.policies.length} 份政策文档 → ${out.chunks.length} 个片段 → ${out.points.length} 个向量点。`));
-    c.append(para('每份文档按 180 字窗口、30 字重叠切块；每个片段生成一个 2048 维向量，写入本实验独立的 Qdrant 集合。'));
-    c.append(para('Qdrant 不是只存向量：每个 point 同时包含 id（结构化标识）、vector（2048 维向量）和 payload（documentId、原文）。'));
-    const dbDetail=el('details',undefined,'inline-details');dbDetail.append(el('summary','集合、向量数据与结构化数据说明'));
+    const c=card('政策检索库已建立');
+    c.append(para(`已处理 ${out.policies.length} 份政策，生成 ${out.chunks.length} 个片段，并写入 ${out.points.length} 个向量点。`));
+    c.append(para('每个片段保留所属政策标识，后续可按适用政策限定检索范围。'));
+    const dbDetail=el('details',undefined,'inline-details');dbDetail.append(el('summary','向量化、索引与存储细节'));
     const dbTable=el('table',undefined,'detail-table');
     const addRow=(k,v)=>{const tr=el('tr');tr.append(el('th',k),el('td',v));dbTable.append(tr);};
     addRow('集合名',out.database.collection);addRow('向量点数',String(out.database.pointsCount));addRow('向量维度',String(out.database.dimensions));addRow('距离函数',out.database.distance);
-    addRow('向量数据','point.vector：2048 个浮点数，检索时算 Cosine');
+    addRow('向量数据',`point.vector：${out.database.dimensions} 个浮点数，检索时算 Cosine`);
     addRow('结构化数据','point.id、payload.documentId、payload.text');
     addRow('范围元数据','region/category/有效期/published 在应用侧，用于先筛政策范围');
+    dbDetail.append(para(`每份文档按 180 个字符窗口、30 个字符重叠切块；每个片段生成一个 ${out.database.dimensions} 维向量。`,'muted'));
+    dbDetail.append(para(`Qdrant 不是只存向量：每个 point 同时包含 id（结构化标识）、vector（${out.database.dimensions} 维向量）和 payload（documentId、原文）。`,'muted'));
+    dbDetail.append(para('B 只建立向量检索库；G 会在适用政策片段上临时构建 BM25 索引，两路使用相同的片段 ID。','muted'));
     dbDetail.append(para('集合名是自动生成的：前半段是本次实验的随机标识，后半段是 Embedding 配置签名；不同实验或不同 Embedding 配置不会混在一起。','muted'),dbTable);
     c.append(dbDetail);
     if(out.points.length){
@@ -176,7 +178,7 @@ function highlights(trace) {
         const chunk=chunkById.get(pt.chunkId),title=policyTitle.get(pt.documentId)||pt.documentId;
         const policy=(out.policies||[]).find(p=>p.id===pt.documentId);
         view.append(para(`这个点属于《${title}》，是原文切出来的${chunk?`第 ${chunk.chunkIndex+1} 段`:'一个片段'}。`));
-        if(policy)view.append(para(`文档信息：文档类型：${policy.documentType||'政策'} · ${regionLabel(policy.region)} · ${categoryLabel(policy.category)} · 生效 ${policy.effectiveFrom} 至 ${policy.effectiveTo} · 可退 ${policy.returnDays} 天 · ${policy.published?'已发布':'未发布'}。`,'muted'));
+        if(policy)view.append(para(`文档信息：文档类型：${policy.documentType||'政策'} · ${regionLabel(policy.region)} · ${categoryLabel(policy.category)} · 生效 ${policy.effectiveFrom} 至 ${policy.effectiveTo} · 退货申请期限：${policy.returnDays} 天 · ${policy.published?'已发布':'未发布'}。`,'muted'));
         const vals=pt.first8.map((v,i)=>`d${i}=${Number(v).toFixed(5)}`);
         const lines=[];for(let i=0;i<vals.length;i+=4)lines.push('      '+vals.slice(i,i+4).join(', '));
         const structure=[
@@ -196,7 +198,7 @@ function highlights(trace) {
         view.append(para('结构说明：','raw-legend-title'));
         const ul=el('ul',undefined,'raw-legend-list');
         [['id','point 的唯一标识，用于去重和更新。'],
-         ['vector','2048 个浮点数就是 2048 个坐标；合起来表示这段文本在 2048 维空间中的一个点。'],
+         ['vector',`${pt.dimensions} 个浮点数就是 ${pt.dimensions} 个坐标；合起来表示这段文本在 ${pt.dimensions} 维空间中的一个点。`],
          ['payload.documentId','这个点属于哪份政策。'],
          ['payload.text','片段原文；随 point 保存，检索命中时返回，但不参与向量距离计算。']
         ].forEach(([k,v])=>{const li=el('li');li.append(el('code',k),document.createTextNode('：'+v));ul.append(li);});
@@ -223,24 +225,43 @@ function highlights(trace) {
     if(trace.input && trace.input.url)c.append(para(`请求地址：${trace.input.url}（应用启动的本地 mock 服务生成，不是用户输入）`,'muted'));
   } else if(trace.node==='filter'){
     const c=card(`5 份政策 → ${out.allowedDocumentIds.length} 份适用`),table=el('table',undefined,'filter-table');
-    out.evaluations.forEach(r=>{const tr=el('tr');tr.append(el('td',r.policyId),el('td',r.included?'纳入':'排除',r.included?'included':'excluded'),el('td',r.reasons.length?r.reasons.join('；'):'—'));table.append(tr);});
-    c.append(table,para('适用版本由购买日期决定，不一定是最新版本。','muted'));
+    const head=el('tr');head.append(el('th','政策'),el('th','筛选结果'),el('th','原因'));table.append(head);
+    const reasonText=r=>{
+      if(r.included)return '已发布；地区、品类和购买日期均匹配';
+      return r.reasons.map(x=>x==='购买日期不在政策有效区间 [from, to)'?'购买日期不在该版本的生效区间':x).join('；')||'—';
+    };
+    out.evaluations.forEach(r=>{
+      const tr=el('tr'),name=el('td');
+      name.append(el('div',r.title),el('div',`（${r.policyId}）`,'muted'));
+      tr.append(name,el('td',r.included?'纳入':'排除',r.included?'included':'excluded'),el('td',reasonText(r)));table.append(tr);
+    });
+    c.append(table,para('适用版本由购买日期决定，不一定是最新版本。签收日期用于计算申请期限。','muted'));
   } else if(trace.node==='keyword'){
-    const c=card('关键词召回（Lucene BM25）');hitList(c,out.hits,'BM25 分数');c.append(para('BM25 分数没有固定区间，不是概率。','muted'));
+    const c=card('关键词检索（Lucene BM25）');hitList(c,out.hits,'BM25 分数');c.append(para('BM25 分数没有固定区间，不是概率；本步骤在适用政策片段上临时构建索引。','muted'));
   } else if(trace.node==='vector'){
-    const c=card('向量召回（Qdrant 过滤）');hitList(c,out.hits,'Cosine 相似度');c.append(para('范围过滤在 Top-K 之前执行；分数不能和 BM25 相加。','muted'));
+    const c=card('向量检索（Qdrant 过滤）');hitList(c,out.hits,'Cosine 相似度');c.append(para('范围过滤在 Top-K 之前执行；分数不能和 BM25 相加。','muted'));
   } else if(trace.node==='fusion'){
-    const c=card('RRF 融合：只看名次，不加原始分数');
+    const c=card('合并两路候选（RRF）');
     (out.contributions || []).slice(0,4).forEach(r=>c.append(el('p',`${r.hit.section || r.hit.id}：关键词 #${r.keywordRank ?? '—'} + 向量 #${r.vectorRank ?? '—'} → RRF ${Number(r.fusedScore).toFixed(4)}`,'row-scores')));
+    c.append(para('按名次计算融合分数，不直接相加原始分数。','muted'));
   } else if(trace.node==='rerank'){
-    const c=card(`模型重排 · ${out.model || ''}`);hitList(c,out.hits,`${out.scoreType || '相关性'} 分数`);c.append(para('重排分数是相关性，不是答案正确率。','muted'));
+    const c=card(`按相关性重排 · ${out.model || ''}`);hitList(c,out.hits,`${out.scoreType || '相关性'} 分数`);c.append(para('分数反映相关性，不代表政策适用性或答案正确率。','muted'));
   } else if(trace.node==='prompt'){
-    const c=card('规则判断 + 组装 Prompt');
-    c.append(el('p',`${out.eligibility.status} · ${out.eligibility.reason}`,'decision'),para(out.eligibility.action));
-    c.append(para(`Prompt 包含：问题、订单事实、履约状态、规则判断、${out.evidence.length} 条政策证据。`));
-    c.append(para('规则判断由应用代码完成，不由语言模型决定。','muted'));
+    const c=card('规则判断与准备模型输入'),e=out.eligibility;
+    c.append(el('p',`${e.status} · ${e.reason}`,'decision'),para(e.action));
+    if(e.status==='CONDITIONAL'){
+      const table=el('table',undefined,'detail-table');
+      const add=(k,v)=>{const tr=el('tr');tr.append(el('th',k),el('td',v));table.append(tr);};
+      add('已确认',`已签收；签收后经过 ${e.signedDays} 天；适用 ${e.returnDays} 天期限；未申请售后`);
+      add('尚未确认','商品是否完好、是否满足其他政策条件');
+      c.append(para('关键对照：','raw-legend-title'),table);
+      c.append(para('满足已知的申请条件；确认商品完好并满足其他政策条件后，可按页面路径提交申请。提交申请不代表审核通过。'));
+    }
+    c.append(para(`模型输入包含：问题、订单事实、履约状态、规则判断、${out.evidence.length} 条政策证据。`));
+    if(e.returnDays>0)c.append(para('本例中的申请期限来自政策的结构化字段 returnDays，不是由语言模型从条款中提取。政策正文用于检索、解释和引用。','muted'));
+    c.append(para('规则判断由应用代码执行，同样的输入会得到同样的结果；商品是否完好等未知条件仍需核实。','muted'));
   } else if(trace.node==='answer'){
-    const c=card('交给用户的回答');c.append(el('div',out.answer,'answer'),para(out.warning,'muted'));
+    const c=card('生成带引用的回答');c.append(el('div',out.answer,'answer'),para(out.warning,'muted'));
   }
 }
 function showCode(code) {

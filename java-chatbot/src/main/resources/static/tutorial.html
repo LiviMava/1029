@@ -1,13 +1,14 @@
 <!doctype html>
 <html lang="zh-CN" data-theme="dark">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>订单 123 · 一条可追溯的 RAG 链路</title><link rel="stylesheet" href="/order-tutorial.css?v=20261029-2"><script src="/order-tutorial.js?v=20261029-2" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>订单 123 · 一条可追溯的 RAG 链路</title><link rel="stylesheet" href="/order-tutorial.css?v=20261029-3"><script src="/order-tutorial.js?v=20261029-3" defer></script></head>
 <body>
 <header><a href="/" class="brand">知序 <small>JAVA RAG LAB</small></a><nav><a href="/document-tutorial.html">文档入库实验 ↗</a><a href="/">返回知识库 ↗</a></nav></header>
 <main>
- <div class="intro"><div><span class="eyebrow">一笔订单，走通企业检索</span><h1>订单 123，现在能退货吗？</h1><p>订单事实（H2 + 履约接口）＋ 适用政策（知识库）＋ 模型组织语言 → 有依据的条件性回答</p></div><details class="why"><summary>这条链路在做什么？</summary><p>先查清订单事实，再筛出这份订单适用的政策版本，然后检索政策条款、做确定性判断，最后让模型组织回答。RAG 的关键不是“向量相似”，而是先确定范围，再在范围内找证据。</p></details></div>
+ <div class="intro"><div><span class="eyebrow">一笔订单，走通企业检索</span><h1>订单 123，现在能退货吗？</h1><p>先查订单和签收状态，再找到这笔订单适用的退货政策。应用规则判断是否可以申请退货，模型根据事实和条款说明理由与操作步骤。</p><p class="demo-date-note">本次演示按 <span id="demo-date"></span> 判断，“现在”指这个固定教学日期。教程判断的是<strong>是否可以有条件申请退货</strong>，不保证退货、退款或审核通过。</p></div><details class="why"><summary>这条链路在做什么？</summary><p>这条链路分两部分：先准备政策检索库，再处理用户问题。处理问题时，先查业务事实、筛选适用政策，再从适用政策中查找相关条款。应用代码给出规则判断，语言模型据此组织回答，并标注政策引用。</p><p>本例重点演示：相似的条款不一定适用。先限定政策范围，再在范围内检索，才能避免引用其他地区、其他年份或未发布的政策。</p></details></div>
  <div class="workspace">
-  <aside class="overview"><div class="overview-heading"><h2>12 步，5 个阶段</h2><span id="progress">第 1 / 12 步</span></div><p class="muted">点击任意一步：先看关键结果；原始数据和实现代码默认收起。</p><div id="pipeline" aria-label="订单检索流水线"></div><p class="muted flow-note">A 的 5 份政策原文供 B 建库；B 的政策库供 F 筛选；D 的订单事实用于 F 和 K；E 的履约状态用于 K。</p><div class="navigation"><button id="previous">← 上一步</button><button id="next">下一步 →</button></div><p class="muted boundary">SQL / HTTP 真实执行；订单、业务状态和政策均为虚构。固定教学日期 <span id="demo-date"></span>。G / H 可并行，演示按顺序执行。只提供建议，不执行售后操作。</p></aside>
+  <aside class="overview"><div class="overview-heading"><h2>12 步，5 个阶段</h2><span id="progress">第 1 / 12 步</span></div><p class="muted">点击任意一步：先看关键结果；原始数据和实现代码默认收起。</p><div id="pipeline" aria-label="订单检索流水线"></div><p class="muted flow-note">A 的政策原文供 B 建库；B 的检索库供 F 筛选；D 的订单事实用于 F 和 K；E 的签收与售后状态用于 K。</p><div class="navigation"><button id="previous">← 上一步</button><button id="next">下一步 →</button></div><p class="muted boundary">SQL / HTTP 真实执行；订单、履约状态和政策均为虚构。G / H 可并行，演示按顺序执行。只提供建议，不执行售后操作。</p></aside>
   <section class="experiment">
+   <p class="scenario-note">选择场景会填入示例问题；本轮订单号以问题中提取的结果为准。</p>
    <div class="setup"><label>演示订单<select id="scenario"></select></label><label class="question">用户问题<input id="question" value="我的订单 123 现在能退货吗？如果可以，该怎么操作？" maxlength="500"></label><button id="create">创建实验</button><button id="clear">清理 / 换订单</button></div>
    <p id="status" class="muted" role="status">正在连接教学服务…</p><div id="error" role="alert" hidden></div>
    <div id="experiment-body">

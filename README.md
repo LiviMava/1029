@@ -52,7 +52,7 @@ Copy-Item .env.example .local.env
 
 ## RAG 教程与逐步实验
 
-新增 [订单 Java RAG 流水线](http://127.0.0.1:8090/tutorial.html)：以“订单 123 能退货吗”为主线，按“政策原文 → 离线准备 → 取业务事实 → 筛政策 + 检索条款 → 判断 + 回答”展示 JDBC、HTTP、双路检索、融合、重排与回答的实际对象和 Java 源码；每步先给关键结果，原始数据和代码默认折叠。讲义与逐步 CLI 见 [订单教程](tutorial/order/README.md)。
+新增 [订单 Java RAG 流水线](http://127.0.0.1:8090/tutorial.html)：以“订单 123 能退货吗”为主线，按“政策原文 → 建立政策检索库 → 取业务事实 → 筛政策 + 检索条款 → 判断 + 回答”展示 JDBC、HTTP、双路检索、融合、重排与回答的实际对象和 Java 源码；每步先给关键结果，原始数据和代码默认折叠。讲义与逐步 CLI 见 [订单教程](tutorial/order/README.md)。
 
 打开 [原文档 RAG 教学实验室](http://127.0.0.1:8090/document-tutorial.html)，使用左侧动态全景图逐步切换，右侧完整展示每一步的输入输出；Embedding 用实际前八维绘图，并按片段展示 Qdrant 的 ID、向量预览和原文 payload，观察解析、分块、真实 Embedding 入库、关键词与向量召回、RRF 融合、重排、Prompt 和生成的实际输入输出。Start-Local 自动启用本地教学接口，其他启动方式默认关闭；教学索引与公司知识库隔离。
 

@@ -114,3 +114,8 @@ body:not(.run-active) .workspace{display:block;max-width:820px;margin:0 auto;hei
 .overview{position:sticky;top:16px;align-self:start;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-gutter:stable}
 #pipeline{flex:0 0 auto;min-height:0;overflow:visible}
 @media(max-width:800px){.overview{position:static;max-height:none;overflow:visible;scrollbar-gutter:auto}}
+
+/* Prominent fixed-date/application-scope note and scenario hint. */
+.intro .demo-date-note{color:#e0c08a;font-size:12px;margin-top:8px}
+.intro .demo-date-note strong{color:#f0d8a8}
+.scenario-note{font-size:12px;color:var(--muted);margin:0 0 8px}

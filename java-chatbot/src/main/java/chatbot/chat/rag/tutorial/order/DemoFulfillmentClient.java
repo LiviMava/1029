@@ -28,7 +28,7 @@ public class DemoFulfillmentClient {
                 long id=Long.parseLong(path.substring("/status/".length()));
                 if(!Set.of(123L,124L,125L,126L,127L,128L,129L).contains(id)) {exchange.sendResponseHeaders(404,-1);return;}
                 var state=new Fulfillment(id,id==128?"IN_TRANSIT":"DELIVERED",id==128?null:DEMO_DATE.minusDays(id==124?10:3),
-                    id==127,DEMO_DATE,"LOCAL_FIXTURE_HTTP · 虚构业务状态");
+                    id==127,DEMO_DATE,"LOCAL_FIXTURE_HTTP · 虚构履约状态");
                 byte[] bytes=json.writeValueAsBytes(state);
                 exchange.getResponseHeaders().set("Content-Type","application/json; charset=utf-8");
                 exchange.sendResponseHeaders(200,bytes.length);exchange.getResponseBody().write(bytes);
@@ -44,9 +44,9 @@ public class DemoFulfillmentClient {
             .timeout(Duration.ofSeconds(5)).GET().build();
         try {
             var response=http.send(request,HttpResponse.BodyHandlers.ofString());
-            if(response.statusCode()!=200) throw new IllegalStateException("业务状态不可用，不得猜测物流或售后状态");
+            if(response.statusCode()!=200) throw new IllegalStateException("履约状态不可用，不得猜测物流或售后状态");
             Fulfillment status=json.readValue(response.body(),Fulfillment.class);
-            if(status.orderId()!=order.id()) throw new IllegalStateException("业务状态与订单不匹配");
+            if(status.orderId()!=order.id()) throw new IllegalStateException("履约状态与订单不匹配");
             return status;
         } catch(InterruptedException e) {
             Thread.currentThread().interrupt();throw new IllegalStateException("业务查询已中断",e);
