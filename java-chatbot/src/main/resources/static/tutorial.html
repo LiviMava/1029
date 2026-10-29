@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="dark">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>订单 123 · 一条可追溯的 RAG 链路</title><link rel="stylesheet" href="/order-tutorial.css?v=20261029-2"><script src="/order-tutorial.js?v=20261029-2" defer></script></head>
+<body>
+<header><a href="/" class="brand">知序 <small>JAVA RAG LAB</small></a><nav><a href="/document-tutorial.html">文档入库实验 ↗</a><a href="/">返回知识库 ↗</a></nav></header>
+<main>
+ <div class="intro"><div><span class="eyebrow">一笔订单，走通企业检索</span><h1>订单 123，现在能退货吗？</h1><p>订单事实（H2 + 履约接口）＋ 适用政策（知识库）＋ 模型组织语言 → 有依据的条件性回答</p></div><details class="why"><summary>这条链路在做什么？</summary><p>先查清订单事实，再筛出这份订单适用的政策版本，然后检索政策条款、做确定性判断，最后让模型组织回答。RAG 的关键不是“向量相似”，而是先确定范围，再在范围内找证据。</p></details></div>
+ <div class="workspace">
+  <aside class="overview"><div class="overview-heading"><h2>12 步，5 个阶段</h2><span id="progress">第 1 / 12 步</span></div><p class="muted">点击任意一步：先看关键结果；原始数据和实现代码默认收起。</p><div id="pipeline" aria-label="订单检索流水线"></div><p class="muted flow-note">A 的 5 份政策原文供 B 建库；B 的政策库供 F 筛选；D 的订单事实用于 F 和 K；E 的履约状态用于 K。</p><div class="navigation"><button id="previous">← 上一步</button><button id="next">下一步 →</button></div><p class="muted boundary">SQL / HTTP 真实执行；订单、业务状态和政策均为虚构。固定教学日期 <span id="demo-date"></span>。G / H 可并行，演示按顺序执行。只提供建议，不执行售后操作。</p></aside>
+  <section class="experiment">
+   <div class="setup"><label>演示订单<select id="scenario"></select></label><label class="question">用户问题<input id="question" value="我的订单 123 现在能退货吗？如果可以，该怎么操作？" maxlength="500"></label><button id="create">创建实验</button><button id="clear">清理 / 换订单</button></div>
+   <p id="status" class="muted" role="status">正在连接教学服务…</p><div id="error" role="alert" hidden></div>
+   <div id="experiment-body">
+   <div class="node-heading"><div><span id="node-type" class="eyebrow"></span><h2 id="node-title"></h2></div><div class="execute-actions"><button id="execute" class="primary">运行这一步</button><button id="next-step">下一步 →</button><button id="run-all">自动跑完剩余步骤</button></div></div>
+   <div id="node-detail" hidden>
+   <div class="boundary-bar"><span>应用 / 端口</span><strong id="boundary"></strong></div>
+   <p id="explanation" class="explanation"></p>
+   <section class="panel summary-panel"><div class="panel-heading"><span class="summary-label">关键结果</span><h3>先看这一步得到了什么</h3></div><div id="highlights"></div></section>
+   <details class="panel raw-panel" id="raw-panel"><summary>原始数据（INPUT / OUTPUT）<span id="timing"></span><span class="muted">默认收起，展开可核对每个字段</span></summary>
+    <div id="raw-legend" class="raw-legend"></div>
+    <div class="packets"><section class="sub-panel"><div class="panel-heading"><span class="input-label">INPUT</span><h3>这一步收到的数据</h3></div><div id="input" class="object-view"></div></section><section class="sub-panel"><div class="panel-heading"><span class="output-label">OUTPUT</span><h3>这一步发出的数据</h3></div><div id="output" class="object-view"></div></section></div>
+   </details>
+   <details class="panel code-panel" id="code-panel"><summary>实现代码 <span id="code-path" class="muted"></span></summary><div class="code-tools"><button id="copy-code">复制代码</button></div><pre><code id="java-code">展开后载入当前构建的源码…</code></pre><p class="muted">源码来自本次构建打包的 Java 文件；只看与这一步相关的片段。</p></details>
+   </div>
+   <button id="export" hidden>导出本轮所有数据包 JSON ↓</button>
+   </div>
+  </section>
+ </div>
+ <footer>讲义与逐步 CLI：tutorial/order/README.md · 保留原文档实验和正式知识库 · 实验会话隔离，30 分钟过期</footer>
+</main></body></html>

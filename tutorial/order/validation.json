@@ -1,0 +1,49 @@
+{
+  "automatedTests": {
+    "total": 66,
+    "skipped": 1,
+    "failed": 0,
+    "passed": 65
+  },
+  "foreignOrderDenied": true,
+  "checkedAt": "2026-10-29T08:12:49.0304847+08:00",
+  "limitations": "Live cloud models and Qdrant; fictional orders and policies. Structural and business-rule assertions, not sentence-level answer certification.",
+  "liveCases": [
+    {
+      "order": 123,
+      "status": "CONDITIONAL",
+      "returnDays": 7,
+      "policy": "cn-standard-2026",
+      "passed": true
+    },
+    {
+      "order": 124,
+      "status": "OUTSIDE_WINDOW",
+      "returnDays": 7,
+      "policy": "cn-standard-2026",
+      "passed": true
+    },
+    {
+      "order": 125,
+      "status": "CONDITIONAL",
+      "returnDays": 14,
+      "policy": "eu-standard-2026",
+      "passed": true
+    },
+    {
+      "order": 126,
+      "status": "INSUFFICIENT_EVIDENCE",
+      "returnDays": 0,
+      "policy": null,
+      "passed": true
+    },
+    {
+      "order": 129,
+      "status": "CONDITIONAL",
+      "returnDays": 5,
+      "policy": "cn-standard-2025",
+      "passed": true
+    }
+  ],
+  "frontend": "11-node DOM simulation and HTTP asset checks passed; no browser visual QA"
+}

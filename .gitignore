@@ -1,0 +1,11 @@
+.runtime/
+.local.env
+.env
+java-chatbot/target/
+nx-mcp-server/target/
+*.log
+.idea/
+.vscode/
+*.iml
+__pycache__/
+*.pyc

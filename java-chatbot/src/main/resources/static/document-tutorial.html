@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>RAG 教学实验室 · 知序</title>
+<script>
+(() => {
+  let saved;try { saved=localStorage.getItem('zhixu.rag.theme'); } catch (_) {}
+  document.documentElement.dataset.theme=saved==='dark'||(saved!=='light'&&window.matchMedia?.('(prefers-color-scheme: dark)').matches)?'dark':'light';
+})();
+</script>
+<link rel="stylesheet" href="/tutorial.css"><script src="/tutorial.js" defer></script></head>
+<body>
+<header class="topbar"><a class="brand" href="/">知序 <span>RAG LAB</span></a><span class="top-note">原理 × 实际输入 × 实际输出</span><div class="top-actions"><button id="theme-toggle" type="button" class="theme-toggle" aria-label="切换明暗主题" aria-pressed="false"><svg id="theme-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.4 14.1A8.6 8.6 0 0 1 9.9 3.6 8.7 8.7 0 1 0 20.4 14.1Z"/></svg><svg id="theme-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><span id="theme-label">暗色主题</span></button><a href="/">返回知识库 ↗</a></div></header>
+<main>
+  <section class="hero"><div><span class="eyebrow">从文档到答案 · 十二个停靠点，一步一停</span><h1>看见一个答案<br>是怎样诞生的。</h1><p>沿流水线逐站前进：每一站先讲为什么，再跑真实数据，最后告诉你该盯住哪个数字。</p></div><div class="hero-note"><span class="live-dot"></span>真实模型 · 真实向量库<p>解析和分块在本地运行。Embedding、模型重排和回答会调用已配置的云端 API。</p><small>三个小样例为虚构数据；下方公开手册保留真实来源和页码。</small></div></section>
+  <div class="workbench">
+  <section class="flow panel" aria-label="RAG 动态数据流">
+    <div class="flow-heading"><div><span class="eyebrow">INTERACTIVE DATA FLOW</span><h2>跟着数据走一遍</h2><p>十二个停靠点连成一条流水线：入库 → 召回 → 融合 → 重排 → 生成 → 验收。点击任意模块，跳到对应的一站。</p></div><div class="flow-progress" id="flow-progress"></div></div>
+    <div class="map-scroll" tabindex="0" aria-label="RAG 全景图，可横向滚动">
+      <svg class="rag-map" viewBox="0 0 780 555" role="group" aria-label="RAG 全景：文档入库、双路召回、融合、重排及回答">
+        <defs>
+          <marker id="map-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z"/></marker>
+          <symbol id="icon-file" viewBox="0 0 24 24"><path d="M6 2h8l4 4v16H6z M14 2v5h5 M9 11h6 M9 15h6 M9 19h4"/></symbol>
+          <symbol id="icon-parse" viewBox="0 0 24 24"><path d="M4 4h16v16H4z M8 8h8 M8 12h8 M8 16h5"/></symbol>
+          <symbol id="icon-chunk" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></symbol>
+          <symbol id="icon-vector" viewBox="0 0 24 24"><circle cx="5" cy="6" r="2"/><circle cx="18" cy="4" r="2"/><circle cx="19" cy="18" r="2"/><circle cx="6" cy="19" r="2"/><path d="M7 6l9-2M6 8v9M8 19l9-1M18 6l1 10M7 8l10 8"/></symbol>
+          <symbol id="icon-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5 M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/></symbol>
+          <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="M15 15l6 6"/></symbol>
+          <symbol id="icon-merge" viewBox="0 0 24 24"><path d="M3 5h5l4 7h9 M3 19h5l4-7 M17 8l4 4-4 4"/></symbol>
+          <symbol id="icon-rank" viewBox="0 0 24 24"><path d="M5 5h14 M5 10h10 M5 15h7 M5 20h4 M18 13v8 M15 18l3 3 3-3"/></symbol>
+          <symbol id="icon-prompt" viewBox="0 0 24 24"><path d="M4 4h16v13H9l-5 4z M8 8h8 M8 12h6"/></symbol>
+          <symbol id="icon-spark" viewBox="0 0 24 24"><path d="M12 2l2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/></symbol>
+          <symbol id="icon-user" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-5 3-7 8-7s8 2 8 7"/></symbol>
+          <symbol id="icon-answer" viewBox="0 0 24 24"><path d="M4 4h16v14H9l-5 3z M8 9h8 M8 13h6"/></symbol>
+        </defs>
+        <rect class="map-lane" x="3" y="8" width="774" height="234" rx="14"/>
+        <rect class="map-lane" x="3" y="250" width="774" height="300" rx="14"/>
+        <text class="map-lane-title" x="18" y="31">01  文档处理与索引</text>
+        <text class="map-lane-title" x="18" y="273">02  用户提问与生成回答</text>
+        <g class="map-wires" fill="none" marker-end="url(#map-arrow)">
+          <path data-stage="parse" d="M140 97 H166"/><path data-stage="chunk" d="M296 97 H322"/>
+          <path data-stage="embed" d="M452 97 H478"/><path data-stage="embed" d="M608 97 H634"/>
+          <path data-stage="retrieve" data-branch="keyword" d="M387 129 V170"/>
+          <path data-stage="retrieve" data-branch="keyword" d="M387 234 V247 H231 V285"/>
+          <path data-stage="retrieve" data-branch="vector" d="M699 129 V247 H307 V420 H296"/>
+          <path data-stage="retrieve" data-branch="keyword" d="M140 372 C153 372 150 317 166 317"/>
+          <path data-stage="retrieve" data-branch="vector" d="M140 372 C153 372 150 417 166 417"/>
+          <path data-stage="fusion" d="M296 317 C312 317 307 372 322 372"/>
+          <path data-stage="fusion" d="M296 417 C312 417 307 372 322 372"/>
+          <path data-stage="rerank" d="M452 372 H478"/><path data-stage="prompt" d="M608 372 H634"/>
+          <path data-stage="generate" d="M699 404 V430 H543 V455"/><path data-stage="generate" d="M608 487 H634"/>
+          <path class="map-question-wire" data-stage="prompt" d="M75 404 V535 H765 V404"/>
+        </g>
+        <g class="map-node map-context" transform="translate(10 65)"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-file"/></svg><text class="map-node-title" x="48" y="27">资料文件</text><text class="map-node-desc" x="48" y="45">PDF / Word / 文本</text></g>
+        <g class="map-node map-action" transform="translate(166 65)" data-stage="parse" role="button" tabindex="0" aria-label="第 01 步：文档解析，点击查看实验"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-parse"/></svg><text class="map-node-title" x="48" y="27">文档解析</text><text class="map-node-desc" x="48" y="45">提取原文与来源</text><circle class="map-complete" cx="100" cy="54" r="3"/><text class="map-node-num" x="117" y="58" text-anchor="end">01</text></g>
+        <g class="map-node map-action" transform="translate(322 65)" data-stage="chunk" role="button" tabindex="0" aria-label="第 02 步：分块，点击查看实验"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-chunk"/></svg><text class="map-node-title" x="48" y="27">分块</text><text class="map-node-desc" x="48" y="45">文本切成片段</text><circle class="map-complete" cx="100" cy="54" r="3"/><text class="map-node-num" x="117" y="58" text-anchor="end">02</text></g>
+        <g class="map-node map-action" transform="translate(478 65)" data-stage="embed" role="button" tabindex="0" aria-label="第 03 步：Embedding，点击查看实验"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-vector"/></svg><text class="map-node-title" x="48" y="27">Embedding</text><text class="map-node-desc" x="48" y="45">文本 → 向量</text><circle class="map-complete" cx="100" cy="54" r="3"/><text class="map-node-num" x="117" y="58" text-anchor="end">03</text></g>
+        <g class="map-node map-action" transform="translate(634 65)" data-stage="embed" data-focus="qdrant" role="button" tabindex="0" aria-label="查看 Qdrant 实际入库记录"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-db"/></svg><text class="map-node-title" x="48" y="27">Qdrant</text><text class="map-node-desc" x="48" y="45">向量 + 片段</text></g>
+        <g class="map-node map-context" transform="translate(322 170)"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-db"/></svg><text class="map-node-title" x="48" y="27">关键词索引</text><text class="map-node-desc" x="48" y="45">召回时建立</text></g>
+        <g class="map-node map-context" transform="translate(10 340)"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-user"/></svg><text class="map-node-title" x="48" y="27">用户提问</text><text class="map-node-desc" x="48" y="45">自然语言问题</text></g>
+        <g class="map-node map-action" transform="translate(166 285)" data-stage="retrieve" data-branch="keyword" role="button" tabindex="0" aria-label="第 04 步：关键词召回，点击查看实验"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-search"/></svg><text class="map-node-title" x="48" y="27">关键词召回</text><text class="map-node-desc" x="48" y="45">BM25 匹配</text><circle class="map-complete" cx="100" cy="54" r="3"/><text class="map-node-num" x="117" y="58" text-anchor="end">04</text></g>
+        <g class="map-node map-action" transform="translate(166 385)" data-stage="retrieve" data-branch="vector" role="button" tabindex="0" aria-label="第 04 步：向量召回，点击查看实验"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-vector"/></svg><text class="map-node-title" x="48" y="27">向量召回</text><text class="map-node-desc" x="48" y="45">语义相似度</text><circle class="map-complete" cx="100" cy="54" r="3"/><text class="map-node-num" x="117" y="58" text-anchor="end">04</text></g>
+        <g class="map-node map-action" transform="translate(322 340)" data-stage="fusion" role="button" tabindex="0" aria-label="第 05 步：融合，点击查看实验"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-merge"/></svg><text class="map-node-title" x="48" y="27">融合</text><text class="map-node-desc" x="48" y="45">RRF 去重</text><circle class="map-complete" cx="100" cy="54" r="3"/><text class="map-node-num" x="117" y="58" text-anchor="end">05</text></g>
+        <g class="map-node map-action" transform="translate(478 340)" data-stage="rerank" role="button" tabindex="0" aria-label="第 06 步：重排，点击查看实验"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-rank"/></svg><text class="map-node-title" x="48" y="27">重排</text><text class="map-node-desc" x="48" y="45">相关性排序</text><circle class="map-complete" cx="100" cy="54" r="3"/><text class="map-node-num" x="117" y="58" text-anchor="end">06</text></g>
+        <g class="map-node map-action" transform="translate(634 340)" data-stage="prompt" role="button" tabindex="0" aria-label="第 07 步：Prompt，点击查看实验"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-prompt"/></svg><text class="map-node-title" x="48" y="27">Prompt</text><text class="map-node-desc" x="48" y="45">问题 + 证据</text><circle class="map-complete" cx="100" cy="54" r="3"/><text class="map-node-num" x="117" y="58" text-anchor="end">07</text></g>
+        <g class="map-node map-action" transform="translate(478 455)" data-stage="generate" role="button" tabindex="0" aria-label="第 08 步：生成回答，点击查看实验"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-spark"/></svg><text class="map-node-title" x="48" y="27">生成回答</text><text class="map-node-desc" x="48" y="45">按证据回答</text><circle class="map-complete" cx="100" cy="54" r="3"/><text class="map-node-num" x="117" y="58" text-anchor="end">08</text></g>
+        <g class="map-node map-action" transform="translate(634 455)" data-stage="generate" data-focus="verify" role="button" tabindex="0" aria-label="第 12 站：验收回答，点击查看实验"><rect class="map-node-bg" width="130" height="64" rx="10"/><rect class="map-icon-bg" x="9" y="11" width="32" height="32" rx="8"/><svg class="map-icon" x="14" y="16" width="22" height="22"><use href="#icon-answer"/></svg><text class="map-node-title" x="48" y="27">答案与引用</text><text class="map-node-desc" x="48" y="45">回查文档来源</text><text class="map-node-num" x="117" y="58" text-anchor="end">12</text></g>
+      </svg>
+    </div>
+    <nav class="flow-navigation" aria-label="实验步骤导航"><button id="flow-prev" type="button" class="quiet">← 上一步</button><button id="flow-next" type="button" class="quiet">下一步 →</button></nav>
+  </section>
+  <div class="lab-pane">
+  <section class="setup" aria-label="实验资料"><div><label for="sample">实验资料</label><select id="sample"><option value="md">员工手册 · Markdown（中文）</option><option value="docx">员工手册 · Word（中文＋表格）</option><option value="pdf">员工手册 · PDF（英文，两页）</option></select></div><button id="prepare" class="primary">准备示例</button><label class="upload">或上传文档<input id="upload" type="file" accept=".pdf,.docx,.doc,.txt,.md"></label><a id="download-sample" href="/api/v1/tutorial/samples/md">下载原文件 ↗</a><button id="clear" class="quiet" disabled>清理实验</button><span id="run-status">尚未创建实验</span></section>
+  <div id="service-status" class="service-status" role="status">正在检查教学服务…</div>
+  <div class="lab-layout"><aside><nav id="steps" aria-label="RAG 链路"></nav><div class="aside-note"><strong>先离线，再连模型</strong><p>第 01、02、08、10 站在本地计算；第 05 站关键词召回不需要模型；第 03、06、07、09、11 站会调用云端模型；第 04、12 站只复核已有结果，不重复调用。</p><button id="run-all" class="primary">运行整条链路 ↗</button><p>完整流程默认使用智谱重排配置，用时取决于模型响应；会产生模型调用费用。</p></div></aside>
+  <section class="lesson" id="lesson" aria-live="polite"><div class="lesson-heading"><span id="lesson-number" class="eyebrow"></span><h2 id="lesson-title"></h2><p id="lesson-summary"></p></div>
+    <div class="principle"><strong>这一步为什么存在？</strong><p id="principle"></p>
+      <div class="step-brief">
+        <h4>看哪里</h4><ul id="look-list"></ul>
+        <h4>试试看</h4><div id="experiment-tip" class="experiment-tip"></div>
+        <details class="pitfall"><summary>常见错误</summary><p id="pitfall"></p></details>
+      </div>
+    </div>
+    <div class="experiment-controls"><div id="controls"></div><button id="execute" class="primary">运行当前实验 →</button><p id="execution-hint" class="muted"></p></div>
+    <div class="io-grid"><section class="panel input-panel"><div class="panel-heading"><span>INPUT</span><h3>进入这一步的数据</h3></div><div id="input-preview" class="preview"></div></section><section class="panel output-panel"><div class="panel-heading"><span>OUTPUT</span><h3>这一步产生的数据</h3><span id="output-meta"></span></div><div id="output"><div class="empty">运行这一步，观察数据如何变化。</div></div></section></div>
+    <div id="error" class="error" role="alert" hidden></div><details class="raw"><summary>查看本步完整输入 / 输出 JSON</summary><button id="export-stage" class="quiet" disabled>下载 JSON</button><pre id="raw-json">尚无结果</pre></details>
+  </section></div>
+  </div>
+  </div>
+  <section class="corpus panel" aria-label="公开员工手册数据集">
+    <div class="panel-heading"><span>PUBLIC HANDBOOKS</span><h2>百份手册，实际问答</h2><button id="corpus-refresh" class="quiet">刷新数据集</button></div>
+    <p id="corpus-status" class="muted" role="status">正在读取公开手册目录…</p>
+    <p class="muted">各机构的公开手册用于检索实验，版本以下载快照为准。提问时请注明机构；回答不代表本公司的制度。</p>
+    <div class="corpus-grid"><div>
+      <label class="field" for="corpus-document"><span>已下载的公开手册</span><select id="corpus-document"></select></label>
+      <p id="corpus-detail" class="muted"></p><a id="corpus-source" target="_blank" rel="noopener noreferrer">查看原始来源 ↗</a>
+      <div class="corpus-pages"><label class="field" for="corpus-from"><span>物理起始页</span><input id="corpus-from" type="number" min="1" max="500" value="1"></label><label class="field" for="corpus-to"><span>物理结束页（最多 3 页）</span><input id="corpus-to" type="number" min="1" max="500" value="1"></label></div>
+      <button id="corpus-prepare" class="quiet" disabled>把所选页放入八步实验 →</button>
+      <p class="muted">完整文件通过正式入库流程建立索引；页面选取仅缩小八步实验的展示范围。</p>
+    </div><div>
+      <label class="field" for="corpus-case"><span>有原文依据的测试问题</span><select id="corpus-case"></select></label>
+      <label class="field" for="corpus-question"><span>提问（可修改）</span><textarea id="corpus-question" rows="3"></textarea></label>
+      <label class="field" for="corpus-scope"><span>检索范围</span><select id="corpus-scope"><option value="selected">所选机构的完整手册</option><option value="all">整个知识库（比较机构时使用）</option></select></label>
+      <button id="corpus-ask" class="primary" disabled>检索并回答 →</button>
+      <p id="corpus-case-note" class="muted"></p><div id="corpus-answer" class="preview" aria-live="polite">选择一个问题，查看实际答案与引用。</div>
+    </div></div>
+    <details><summary id="corpus-report-title">最近一次自动回归测试</summary><div id="corpus-report"></div></details>
+  </section>
+  <footer><p>教学索引与公司知识库隔离。实验保留 30 分钟；可主动清理。服务重启后需重新创建实验。</p><button id="export-all" class="quiet" disabled>导出本轮全部实验结果 ↓</button></footer>
+</main>
+</body></html>

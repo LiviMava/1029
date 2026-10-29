@@ -1,0 +1,337 @@
+{
+  "finishedAt": "2026-10-14T11:09:27.608669+00:00",
+  "corpus": {
+    "passed": true,
+    "minimum": 100,
+    "downloaded": 100,
+    "readyHybrid": 100,
+    "pages": 6220,
+    "chunks": 26072,
+    "checksumsValid": true,
+    "uniqueFilesAndTexts": true,
+    "vectors": [
+      {
+        "collection": "company_chunks_v1_f5ce7f0ec932",
+        "expectedPoints": 26072,
+        "actualPoints": 26072,
+        "passed": true
+      }
+    ]
+  },
+  "rerankMode": "http",
+  "passed": 9,
+  "total": 9,
+  "allPassed": true,
+  "cases": [
+    {
+      "id": "HB01",
+      "query": "According to Carnegie Mellon's staff handbook, how long are unpaid meal periods and how much paid break time may be scheduled per day?",
+      "scope": "document",
+      "negative": false,
+      "expectedDocument": "cmu-edu-b802e0ea27.pdf",
+      "expectedPages": [
+        12
+      ],
+      "retrievalPassed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "passed": true,
+      "answer": "According to the Carnegie Mellon staff handbook:\n\n- **Unpaid meal periods**: last **at least one half-hour (30 minutes)** but **not more than one hour** [1][2].\n- **Paid breaks**: scheduled breaks are optional and determined by each department; if scheduled, they are **limited to 15 minutes per day** and are paid [1].\n\nSo, meal periods are unpaid and may be 30–60 minutes, while paid break time may be up to **15 minutes per day** when scheduled.",
+      "citedSources": [
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 12
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 12
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 12
+        }
+      ],
+      "retrievalMode": "HYBRID_RERANKED",
+      "chatRetrievalMode": "HYBRID_RERANKED",
+      "rerankPassed": true,
+      "elapsedMs": 5625
+    },
+    {
+      "id": "HB02",
+      "query": "At the University of Indianapolis, how long is the introductory period for new exempt and non-exempt staff, excluding police officers?",
+      "scope": "document",
+      "negative": false,
+      "expectedDocument": "uindy-edu-200a2479e9.pdf",
+      "expectedPages": [
+        25
+      ],
+      "retrievalPassed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "passed": true,
+      "answer": "For new exempt and non-exempt staff at the University of Indianapolis, the introductory period is **the first six (6) months** [1]. Police officers are excluded from this question, and their introductory period is different [1].",
+      "citedSources": [
+        {
+          "filename": "uindy-edu-200a2479e9.pdf",
+          "page": 25
+        },
+        {
+          "filename": "uindy-edu-200a2479e9.pdf",
+          "page": 25
+        }
+      ],
+      "retrievalMode": "HYBRID_RERANKED",
+      "chatRetrievalMode": "HYBRID_RERANKED",
+      "rerankPassed": true,
+      "elapsedMs": 3515
+    },
+    {
+      "id": "HB03",
+      "query": "According to NEOMED's employee handbook, how many paid holidays does the university compensate employees for each year?",
+      "scope": "document",
+      "negative": false,
+      "expectedDocument": "neomed-edu-fc95f5c63f.pdf",
+      "expectedPages": [
+        17
+      ],
+      "retrievalPassed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "passed": true,
+      "answer": "According to NEOMED's Employee Handbook, the University compensates employees for **ten paid holidays per year** [1].\n\nThe listed holidays are New Year's Day, Martin Luther King, Jr., Day, Memorial Day, Independence Day, Labor Day, Veterans Day, Thanksgiving Day, and Christmas Day, plus two \"floating\" holidays — Columbus Day (observed the Friday after Thanksgiving) and Presidents Day (observed either before or after Christmas) [1].\n\nNo information beyond this was needed or available in the evidence; the question is fully answered by page 17 of the handbook [1].",
+      "citedSources": [
+        {
+          "filename": "neomed-edu-fc95f5c63f.pdf",
+          "page": 17
+        },
+        {
+          "filename": "neomed-edu-fc95f5c63f.pdf",
+          "page": 17
+        },
+        {
+          "filename": "neomed-edu-fc95f5c63f.pdf",
+          "page": 17
+        }
+      ],
+      "retrievalMode": "HYBRID_RERANKED",
+      "chatRetrievalMode": "HYBRID_RERANKED",
+      "rerankPassed": true,
+      "elapsedMs": 3375
+    },
+    {
+      "id": "HB04",
+      "query": "Under the Forty-Niner Shops handbook, how long is each rest break for a non-exempt employee and how many hours of work earn one rest break?",
+      "scope": "document",
+      "negative": false,
+      "expectedDocument": "csulb-edu-0d75e0b7fc.pdf",
+      "expectedPages": [
+        13
+      ],
+      "retrievalPassed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "passed": true,
+      "answer": "According to the handbook:\n\n- **Length of each rest break:** 15 minutes [3]\n- **Hours worked per rest break:** One (1) 15-minute rest break for every four (4) hours worked [3]; for shifts in excess of 14 hours, employees continue to be entitled to additional paid 15-minute rest breaks for every four (4) hours worked [2].\n\nAdditional detail: no rest break need be authorized for employees whose total daily work time is less than 3.5 hours; shifts of 3.5 to 6 hours earn one rest break, and shifts over 6 up to 10 hours earn two rest breaks [3].",
+      "citedSources": [
+        {
+          "filename": "csulb-edu-0d75e0b7fc.pdf",
+          "page": 13
+        },
+        {
+          "filename": "csulb-edu-0d75e0b7fc.pdf",
+          "page": 13
+        },
+        {
+          "filename": "csulb-edu-0d75e0b7fc.pdf",
+          "page": 14
+        },
+        {
+          "filename": "csulb-edu-0d75e0b7fc.pdf",
+          "page": 13
+        }
+      ],
+      "retrievalMode": "HYBRID_RERANKED",
+      "chatRetrievalMode": "HYBRID_RERANKED",
+      "rerankPassed": true,
+      "elapsedMs": 3141
+    },
+    {
+      "id": "HB05",
+      "query": "At Rocky Vista University, if additional time is needed for bereavement, how many days of accrued sick leave may be converted to bereavement leave?",
+      "scope": "document",
+      "negative": false,
+      "expectedDocument": "employeehandbook-rvu-edu-d7f39c098b.pdf",
+      "expectedPages": [
+        16
+      ],
+      "retrievalPassed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "passed": true,
+      "answer": "Three (3) days of accrued sick leave may be converted to bereavement leave if additional time is needed [1].",
+      "citedSources": [
+        {
+          "filename": "employeehandbook-rvu-edu-d7f39c098b.pdf",
+          "page": 16
+        }
+      ],
+      "retrievalMode": "HYBRID_RERANKED",
+      "chatRetrievalMode": "HYBRID_RERANKED",
+      "rerankPassed": true,
+      "elapsedMs": 2734
+    },
+    {
+      "id": "HB06",
+      "query": "What tuition percentage and course-count benefit does Carnegie Mellon provide eligible full-time staff taking courses at CMU, and what tuition percentage does it pay for qualifying courses at other institutions?",
+      "scope": "document",
+      "negative": false,
+      "expectedDocument": "cmu-edu-b802e0ea27.pdf",
+      "expectedPages": [
+        26
+      ],
+      "retrievalPassed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "passed": true,
+      "answer": "For eligible full-time staff:\n\n- **Courses taken at Carnegie Mellon:** **100% tuition remission for up to two courses at any one time** [1].\n- **Courses taken at other institutions:** Carnegie Mellon pays **50% of tuition costs** [1]. Such courses must be **credit bearing and career related** [1].\n\nThe tuition benefit program is described as tuition remission or assistance for eligible staff members and their dependent children, with courses taken at Carnegie Mellon or another institution [2].",
+      "citedSources": [
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 26
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 26
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 26
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 26
+        }
+      ],
+      "retrievalMode": "HYBRID_RERANKED",
+      "chatRetrievalMode": "HYBRID_RERANKED",
+      "rerankPassed": true,
+      "elapsedMs": 4032
+    },
+    {
+      "id": "HB07",
+      "query": "印第安纳波利斯大学（University of Indianapolis）的普通新员工入职考察期 introductory period 是多久？这里不问警察岗位。请用中文回答。",
+      "scope": "document",
+      "negative": false,
+      "expectedDocument": "uindy-edu-200a2479e9.pdf",
+      "expectedPages": [
+        25
+      ],
+      "retrievalPassed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "passed": true,
+      "answer": "根据文档，普通新员工（exempt 和 non-exempt staff，不含警察岗位）的入职考察期 introductory period 为 **前六（6）个月**。[1]\n\n文档还说明，新员工在入职六个月后会接受绩效评估，成功的绩效评估即完成该考察期。[2]",
+      "citedSources": [
+        {
+          "filename": "uindy-edu-200a2479e9.pdf",
+          "page": 25
+        },
+        {
+          "filename": "uindy-edu-200a2479e9.pdf",
+          "page": 25
+        }
+      ],
+      "retrievalMode": "HYBRID_RERANKED",
+      "chatRetrievalMode": "HYBRID_RERANKED",
+      "rerankPassed": true,
+      "elapsedMs": 3656
+    },
+    {
+      "id": "HB08",
+      "query": "CMU 在 2029 年给派驻火星基地的员工发多少美元月度津贴？请仅依据这份员工手册回答。",
+      "scope": "document",
+      "negative": true,
+      "expectedDocument": "cmu-edu-b802e0ea27.pdf",
+      "expectedPages": [],
+      "retrievalPassed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "passed": true,
+      "answer": "无法从现有文档确认。\n\n所提供的证据均为 CMU《Staff Handbook: A Human Resources Guide》的片段，内容涉及薪酬资源指引、职位调动、强制报告义务、职位申请、裁员通知以及远程办公/电信办公的定义等常规人力资源事项 [1][2][3][4][5][6]。这些页面中：\n\n- 没有任何关于“火星基地”“派驻”“外派津贴”或 2029 年的内容；\n- 也没有给出任何按美元计价的月度津贴金额。\n\n因此，关于“2029 年派驻火星基地员工的月度津贴金额”，现有文档未提供依据，无法回答。若需该信息，建议查阅专门的国际派驻/外派薪酬政策文件，而非这份员工手册。",
+      "citedSources": [
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 23
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 20
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 14
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 18
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 22
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 12
+        }
+      ],
+      "retrievalMode": "HYBRID_RERANKED",
+      "chatRetrievalMode": "HYBRID_RERANKED",
+      "rerankPassed": true,
+      "elapsedMs": 3234
+    },
+    {
+      "id": "HB09",
+      "query": "我听说 CMU 员工去上海出差的酒店上限是每晚 650 元。这份 CMU 员工手册是否能证明这个金额？请用中文回答，不要借用其他公司的规定。",
+      "scope": "document",
+      "negative": true,
+      "expectedDocument": "cmu-edu-b802e0ea27.pdf",
+      "expectedPages": [],
+      "retrievalPassed": true,
+      "answerPassed": true,
+      "citationPassed": true,
+      "passed": true,
+      "answer": "不能证明。\n\n本轮提供的 CMU 员工手册证据中，[1] 涉及强制报告，[2] 涉及内部职位申请，[3] 涉及薪酬资源，[4] 涉及信息安全与酒精药物，[5] 涉及转岗和职业发展，[6] 涉及哺乳支持；这些内容均未提到“上海出差”“酒店住宿标准”“每晚 650 元”或类似差旅报销限额。\n\n因此，依据本轮证据，无法确认 CMU 员工去上海出差的酒店上限是每晚 650 元。该金额是否有内部依据，需要查阅 CMU 的差旅或费用报销政策，但本轮未提供相关资料，不能从现有文档确认。",
+      "citedSources": [
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 14
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 18
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 23
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 45
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 20
+        },
+        {
+          "filename": "cmu-edu-b802e0ea27.pdf",
+          "page": 17
+        }
+      ],
+      "retrievalMode": "HYBRID_RERANKED",
+      "chatRetrievalMode": "HYBRID_RERANKED",
+      "rerankPassed": true,
+      "elapsedMs": 6610
+    }
+  ],
+  "limitations": "Snapshot-specific regression with deterministic fact assertions; not a general factuality guarantee. Source scoping is not an authorization boundary."
+}
