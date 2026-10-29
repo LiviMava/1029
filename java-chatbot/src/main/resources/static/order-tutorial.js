@@ -521,6 +521,13 @@ async function action(work,text=''){$('error').hidden=true;busy=true;busyText=te
 async function execute(i){selected=i;for(let j=i;j<config.nodes.length;j++)delete traces[config.nodes[j].id];render();const trace=await api(`/runs/${run.runId}/${config.nodes[i].id}`,'POST');traces[trace.node]=trace;codes.set(trace.node,trace.javaCode);}
 $('previous').onclick=()=>{selected--;render();};$('next').onclick=()=>{selected++;render();};
 $('next-step').onclick=()=>{if(!busy&&selected<config.nodes.length-1){selected++;render();}};
+$('counterexamples').onclick=event=>{
+ const button=event.target.closest('button[data-order]');if(!button)return;
+ if(run||busy){$('counterexample-hint').textContent='请先清理当前实验，再选择反例；当前运行结果仍保留供核对。';return;}
+ const id=button.dataset.order;$('scenario').value=id;
+ $('question').value=`我的订单 ${id} 现在能退货吗？如果可以，该怎么操作？`;
+ $('counterexample-hint').textContent=`已选择订单 ${id}。点击创建实验，观察事实、政策范围和最终判断如何变化。`;
+};
 $('scenario').onchange=()=>{$('question').value=`我的订单 ${$('scenario').value} 现在能退货吗？如果可以，该怎么操作？`;};
 $('create').onclick=()=>action(async()=>{restoreNotice='';run=await api('/runs','POST',{question:$('question').value});traces={};selected=0;renderedIndex=-1;sessionStorage.setItem('orderTutorial.run',run.runId);},'正在创建实验…');
 $('clear').onclick=()=>action(async()=>{try{await api('/runs/'+run.runId,'DELETE');}catch(e){if(!/^(404|410)/.test(e.message))throw e;}restoreNotice='';run=null;traces={};selected=0;renderedIndex=-1;sessionStorage.removeItem('orderTutorial.run');const id=$('scenario').value||'123';$('question').value=`我的订单 ${id} 现在能退货吗？如果可以，该怎么操作？`;},'正在清理实验…');
