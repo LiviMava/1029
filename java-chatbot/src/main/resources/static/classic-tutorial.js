@@ -26,7 +26,14 @@ function results(t){$('result').replaceChildren();if(!t){$('result').append(el('
  case 'documents':o.forEach(d=>card(d.filename,d.text));break;
  case 'parse':o.forEach(d=>{const c=card(d.source);d.sections.forEach(s=>c.append(el('blockquote',s.text)));});break;
  case 'chunk':o.forEach(p=>card(`片段 ${p.id} · ${p.source} · ${p.text.length} 字符`,p.text));break;
- case 'embed':case 'question':o.forEach(vector);break;
+ case 'embed':case 'question':{
+ const c=card('先看含义，再看坐标');
+ c.append(el('p','下面是语义关系示意，不是本轮相似度测量。'));
+ [['能退货吗？','退货申请条件'],['不想要了，怎么寄回去？','退货条件与操作流程'],['快递到哪里了？','配送查询']].forEach(([q,target])=>c.append(el('p',q+' → 希望找到：'+target)));
+ c.append(el('p','不同措辞可以表达相近含义。Embedding 将文本表示为向量，检索比较完整向量；单个坐标不能解释为某个业务属性。'));
+ const d=el('details');d.append(el('summary','展开本轮真实向量前 8 维'));c.append(d);
+ o.forEach((v,i)=>{const row=el('p',`向量 ${i+1} · ${v.dimensions} 维：${v.first8.map(x=>Number(x).toFixed(4)).join('，')}`);d.append(row);});break;
+ }
  case 'store':card('Milvus 已写入',JSON.stringify(o,null,2));break;
  case 'search':case 'rerank':hits(o);break;
  case 'prompt':o.forEach(m=>card(m.role,m.content));break;
