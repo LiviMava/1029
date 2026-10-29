@@ -33,7 +33,7 @@ public class ApiAccessFilter extends OncePerRequestFilter {
             // route except an explicit read-only public allowlist, including encoded/matrix URLs.
             String path=request.getServletPath();
             boolean publicPath=request.getMethod().equals("GET") && (Set.of("/", "/index.html", "/rag.js", "/rag.css",
-                "/tutorial.html", "/tutorial.js", "/tutorial.css", "/document-tutorial.html", "/order-tutorial.js", "/order-tutorial.css", "/favicon.ico", "/api/v1/system", "/actuator/health", "/swagger-ui.html", "/v3/api-docs").contains(path)
+                "/classic-tutorial.html", "/classic-tutorial.js", "/classic-tutorial.css", "/tutorial.html", "/tutorial.js", "/tutorial.css", "/document-tutorial.html", "/order-tutorial.js", "/order-tutorial.css", "/favicon.ico", "/api/v1/system", "/actuator/health", "/swagger-ui.html", "/v3/api-docs").contains(path)
                 || path.startsWith("/swagger-ui/") || path.startsWith("/v3/api-docs/"));
             boolean protectedPath=!publicPath;
             if (protectedPath) response.setHeader("Cache-Control","no-store");
@@ -51,7 +51,11 @@ public class ApiAccessFilter extends OncePerRequestFilter {
             if(protectedPath && !publicPath && !properties.apiKey().isBlank()) {
                 String supplied=Objects.requireNonNullElse(request.getHeader("Authorization"),"");
                 String expected="Bearer "+properties.apiKey();
-                if(!MessageDigest.isEqual(supplied.getBytes(StandardCharsets.UTF_8),expected.getBytes(StandardCharsets.UTF_8))) {
+                boolean headerValid=MessageDigest.isEqual(supplied.getBytes(StandardCharsets.UTF_8),expected.getBytes(StandardCharsets.UTF_8));
+                var session=request.getSession(false);
+                boolean sessionValid=session!=null && expected.equals(session.getAttribute("rag.authenticatedToken"));
+                if(headerValid && !sessionValid){request.getSession(true).setAttribute("rag.authenticatedToken",expected);}
+                if(!headerValid && !sessionValid) {
                     response.setHeader("WWW-Authenticate","Bearer");
                     reject(response,401,"请提供有效的服务访问令牌",requestId);return;
                 }

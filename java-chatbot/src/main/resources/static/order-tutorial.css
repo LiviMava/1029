@@ -65,8 +65,8 @@ body:not(.run-active) #clear{display:none}
 .policy-text{margin:6px 0 0;padding:8px 12px;border-left:3px solid var(--line);color:#c8c8c8;white-space:pre-wrap;font-size:12px}
 .detail-table td{overflow-wrap:anywhere}
 
-/* Qdrant point structure preview: the vector grid is a slice of this record. */
-.qdrant-structure{margin:8px 0 12px;padding:12px 14px;background:#1c1f24;border:1px solid var(--line);border-radius:8px;color:#d8d8d8;font:12px/1.8 Consolas,"Microsoft YaHei",monospace;white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto}
+/* Milvus point structure preview: the vector grid is a slice of this record. */
+.milvus-structure{margin:8px 0 12px;padding:12px 14px;background:#1c1f24;border:1px solid var(--line);border-radius:8px;color:#d8d8d8;font:12px/1.8 Consolas,"Microsoft YaHei",monospace;white-space:pre-wrap;overflow-wrap:anywhere;overflow-x:auto}
 
 /* Source documents and the chunk picker: text sits next to the select. */
 .doc-card{border-top:1px solid var(--line);padding-top:8px;margin-top:8px}
@@ -134,3 +134,34 @@ body:not(.run-active) .workspace{display:block;max-width:820px;margin:0 auto;hei
 .assembled-message{border:1px solid var(--line);border-radius:8px;background:#1c1f24;overflow:hidden}
 .assembled-role{display:block;padding:6px 10px;background:#262b33;color:var(--blue);font:11px Consolas,monospace;text-transform:uppercase}
 .assembled-content{margin:0;padding:10px;max-height:320px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font:11px/1.7 Consolas,"Microsoft YaHei",monospace;color:#d8d8d8}
+
+/* Two top-level groups: policy preparation vs this question's pipeline. */
+.phase-group{margin:4px 0 2px;padding:6px 8px;border-left:3px solid var(--blue);background:#20242b;border-radius:4px}
+.phase-group-label{display:block;font-size:12px;font-weight:600;color:var(--ink)}
+.phase-group-hint{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+/* K: rule judgment first, then model materials and collapsed messages. */
+.k-conclusion{margin:6px 0;font-size:17px;font-weight:600;color:var(--ink)}
+.k-status-tag{margin-left:8px;font:10px Consolas,monospace;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:2px 5px;vertical-align:middle}
+.k-message-map{border:1px solid var(--line);border-radius:8px;background:#1e1e1e;margin:8px 0 14px}
+.k-message-row{display:flex;gap:10px;padding:8px 10px;border-bottom:1px solid var(--line);font-size:12px}
+.k-message-row:last-child{border-bottom:0}
+.k-message-key{flex:0 0 96px;color:var(--blue);font:11px Consolas,monospace}
+.k-message-value{color:#c8c8c8;overflow-wrap:anywhere}
+.context-text{margin:6px 0 0;padding:8px 12px;border-left:3px solid var(--line);color:#c8c8c8;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
+.context-text mark{background:#4a4020;color:#f0d8a8;padding:0 2px;border-radius:2px}
+
+/* K rule table: keep the source column readable. */
+.k-judgment-table th:nth-child(2){width:auto}
+.k-judgment-table td.muted{font-size:11px;line-height:1.5}
+/* Developer walkthrough: visual relationships first, explanations on demand. */
+.developer-map{margin:0 0 20px;padding:18px;border:1px solid var(--line);border-radius:12px;background:#1c222b}
+.map-heading{display:flex;gap:16px;align-items:center;margin-bottom:14px}.map-heading span{color:var(--muted);font-size:12px}
+.map-lanes,.step-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:center}
+.map-lanes>div,.flow-box{display:flex;flex-direction:column;gap:8px;padding:14px;background:#252d39;border:1px solid #3a4658;border-radius:9px;min-width:0}
+.map-lanes strong{font-size:16px}.map-lanes span,.flow-box small{font-size:11px;color:#a9bedb}.map-lanes .map-tag{color:#9cdbcb}.map-plus,.flow-arrow{font-size:22px;color:#91b9ee}
+.developer-map details{margin-top:12px;font-size:12px;color:var(--muted)}summary{cursor:pointer}
+.step-flow{margin:8px 0 12px}.flow-box strong{font:13px/1.6 Consolas,'Microsoft YaHei',monospace;overflow-wrap:anywhere}.flow-state{font-size:11px;color:var(--muted)}
+.step-why{margin:10px 0 16px;font-size:12px;color:var(--muted)}
+.intro>div>p:not(.demo-date-note),.intro>.why,.overview>p,.phase-hint,.phase-group-hint,.chip-sub,.scenario-note,#explanation{display:none}
+.summary-panel>.panel-heading{display:none}.boundary-bar{font-size:11px;opacity:.8}.code-panel{border-color:#3a4658}
+@media(max-width:800px){.map-lanes,.step-flow{grid-template-columns:1fr}.map-plus,.flow-arrow{text-align:center;transform:rotate(90deg)}.map-heading{display:block}.map-heading span{display:block;margin-top:6px}}

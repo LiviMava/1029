@@ -24,19 +24,20 @@ class OrderTutorialTest {
     OrderTutorialService service;
     ModelGateway models;
     Reranker reranker;
-    QdrantIndex index;
+    OrderMilvusIndex index;
     @BeforeEach void setUp() throws Exception {
         orders=new DemoOrderRepository();api=new DemoFulfillmentClient(new ObjectMapper());
-        models=mock(ModelGateway.class);reranker=mock(Reranker.class);index=mock(QdrantIndex.class);
+        models=mock(ModelGateway.class);reranker=mock(Reranker.class);index=mock(OrderMilvusIndex.class);
         when(models.embeddingConfigured()).thenReturn(true);when(models.chatConfigured()).thenReturn(true);
         when(models.embed(anyList())).thenAnswer(call->((List<?>)call.getArgument(0)).stream().map(x->new float[]{1,0,0,0}).toList());
         when(models.tutorialAnswer(any())).thenReturn("签收 3 天，在 7 天期限内；商品完好等条件需确认。[1]");
         when(reranker.configured()).thenReturn(true);when(reranker.scoreType()).thenReturn("RAW_RELEVANCE");when(reranker.model()).thenReturn("test");
         when(reranker.rerank(anyString(),anyList(),anyInt())).thenAnswer(call->call.getArgument(1));
+        when(index.filter(any())).thenReturn("documentId in [\"cn-standard-2026\"]");
         when(index.statistics()).thenReturn(Map.of("pointsCount",10,"dimensions",4,"collection","rag_tutorial_test"));
         var p=new RagProperties(data,"",new RagProperties.Model("","",""),new RagProperties.Embedding("","","test",4),
             new RagProperties.Qdrant("localhost",6334,"http://localhost:6333","",false,"test"),new RagProperties.Retrieval(10,4,-1,"","",""));
-        service=spy(new OrderTutorialService(p,models,new DocumentParser(),reranker,new ObjectMapper(),orders,api));
+        service=spy(new OrderTutorialService(p,models,new DocumentParser(),reranker,new ObjectMapper(),orders,api,mock(chatbot.chat.rag.tutorial.classic.ClassicMilvus.class)));
         doReturn(index).when(service).createIndex(any());
     }
     @AfterEach void close(){api.close();orders.close();}
