@@ -353,7 +353,13 @@ function highlights(trace) {
     const policies=(traces.prepare&&traces.prepare.output&&traces.prepare.output.policies)||[];
     const policy=policies.find(p=>p.id===policyId);
     const policyName=policy?policy.title:(out.evidence[0]&&out.evidence[0].section)||policyId||'—';
-    c.append(para('规则判断','raw-legend-title'));
+    c.append(para('结论从哪里来？','raw-legend-title'));
+ const origins=el('div',undefined,'block-grid');
+ const rule=el('section',undefined,'block');rule.append(el('h3','应用代码：判断资格'),para('订单事实 + 履约状态 + 结构化政策 returnDays → 规则结果。期限不是由模型临时从原文猜出来的。'));
+ const explanation=el('section',undefined,'block');explanation.append(el('h3','语言模型：组织解释'),para('规则结果 + 检索原文 + 用户问题 → 理由、操作说明和引用。原文证据可以核对，引用编号有效仍不等于每句话正确。'));
+ origins.append(rule,explanation);c.append(origins);
+ c.append(para('本例的 returnDays 等结构化政策字段已由教学数据准备好。实际应用需要维护字段与政策原文的一致性；不能只更新其中一份。'));
+ c.append(para('规则判断','raw-legend-title'));
     c.append(el('p',eligibilityLabel(e.status),'k-conclusion'));
     if(e.status==='CONDITIONAL')c.append(para(`订单于 ${live.signedAt||'—'} 签收，到教学日期 ${config.demoDate} 已过 ${e.signedDays} 天，仍在适用政策允许的 ${e.returnDays} 天申请期限内。`));
     else c.append(para(`${e.reason}。`));

@@ -37,3 +37,6 @@ WSL 虚拟磁盘位于 `.runtime/ubuntu-milvus`；数据库数据在该 Linux �
 
 官方协议参考：https://milvus.io/api-reference/restful/v2.6.x/v2/Collection%20(v2)/Create.md
 官方独立部署参考：https://github.com/milvus-io/milvus/blob/v2.6.4/scripts/standalone_embed.sh
+
+## 新手演讲主线
+先展示两段教学原文和人工推导（明确不是模型运行结果），让听众看到事实、期限与操作路径如何形成答案。再问“有一万份资料怎么办”，引出检索，然后按现有执行顺序拆解建库。顶部答案卡随实际 traces 更新。向量步骤先讲措辞与含义对照，再展开真实坐标；重排作为增强机制讲解。源码默认收起。
