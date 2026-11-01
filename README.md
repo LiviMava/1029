@@ -2,6 +2,10 @@
 
 在现有 Java 聊天项目上扩展的 RAG 服务。支持 PDF、Word、TXT、Markdown 导入，中文关键词与向量混合检索、可选模型重排、带出处回答、REST API 和网页管理台。文档、数据库、依赖缓存与日志保存在当前项目目录；模型通过可替换的云端兼容 API 调用。
 
+## Java 代码导读与同事分享
+
+从订单 123 逐步读到检索、重排和模型调用：[Java 代码带读与 40 分钟讲述提纲](docs/JAVA_CODE_WALKTHROUGH.md)。包含三条链路地图、方法阅读顺序、断点建议、演示清单及常见问题。
+
 ## 快速启动（Windows）
 
 要求已有 **JDK 17**（JAVA_HOME 指向 JDK）和 Maven。无需安装 Docker、Python 或 Node 才能运行应用。
