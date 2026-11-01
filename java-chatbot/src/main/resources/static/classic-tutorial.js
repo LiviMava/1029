@@ -35,7 +35,15 @@ function results(t){$('result').replaceChildren();if(!t){$('result').append(el('
  o.forEach((v,i)=>{const row=el('p',`向量 ${i+1} · ${v.dimensions} 维：${v.first8.map(x=>Number(x).toFixed(4)).join('，')}`);d.append(row);});break;
  }
  case 'store':card('Milvus 已写入',JSON.stringify(o,null,2));break;
- case 'search':case 'rerank':hits(o);break;
+ case 'search':hits(o);break;
+ case 'rerank':{
+ const before=traces.search?.output||[];
+ const c=card('重排前后对照 · 同一片段的名次');
+ o.forEach((h,i)=>{const old=before.findIndex(x=>x.id===h.id);c.append(el('p',`片段 ${h.id} · ${h.filename}：召回 #${old+1} → 重排 #${i+1}`));});
+ const changed=o.some((h,i)=>before[i]?.id!==h.id);
+ c.append(el('p',changed?'本轮名次发生变化。请核对首次申请条件和操作步骤是否更靠前；变化本身不等于质量提高。':'本轮顺序未变。不能据此声称重排提高了效果。'));
+ hits(o);break;
+ }
  case 'prompt':o.forEach(m=>card(m.role,m.content));break;
  case 'answer':card('模型回答',o.answer,'answer');const c=card('本轮引用原文');(o.citations||[]).forEach((h,i)=>{const d=el('details');d.append(el('summary',`[${i+1}] ${h.filename}`),el('blockquote',h.text));c.append(d);});if(o.note)c.append(el('small',o.note));break;
  }

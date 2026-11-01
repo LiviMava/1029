@@ -15,7 +15,7 @@ class ClassicRagTest {
     @Test void actualDocumentsParseAndChunkWithProvenance(){
         var s=new ClassicRagService(new DocumentParser(),mock(ModelGateway.class),mock(ClassicMilvus.class),mock(Reranker.class),new ObjectMapper());
         var docs=s.documents();assertEquals(3,docs.size());assertEquals(3,s.parse(docs).size());
-        var pieces=s.chunk(s.parse(docs));assertTrue(pieces.stream().allMatch(p->p.text().length()<=220));
+        var pieces=s.chunk(s.parse(docs));assertTrue(pieces.size()>12,"Corpus must exceed recall Top 6");assertTrue(pieces.stream().allMatch(p->p.text().length()<=220));
         assertTrue(pieces.stream().anyMatch(p->p.source().equals("order-123.md")&&p.text().contains("123")));
         assertTrue(pieces.stream().anyMatch(p->p.text().contains("7 天")));
         assertTrue(pieces.stream().anyMatch(p->p.text().contains("退货退款")));

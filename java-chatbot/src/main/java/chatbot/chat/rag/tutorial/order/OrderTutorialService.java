@@ -177,8 +177,10 @@ public class OrderTutorialService {
                 }
             }
         } catch(java.io.IOException e){throw new IllegalStateException("教学政策文件处理失败",e);}
-        // 5. 一次批量调用 Embedding，把每个片段变成当前配置维度的向量。
-        var vectors=models.embed(chunks.stream().map(ChunkRecord::text).toList());
+        // 5. 每批最多 16 个片段，避免扩充语料后超过供应商的单次输入数量限制。
+        List<float[]> vectors=new ArrayList<>();
+        for(int start=0;start<chunks.size();start+=16)
+            vectors.addAll(models.embed(chunks.subList(start,Math.min(start+16,chunks.size())).stream().map(ChunkRecord::text).toList()));
         // 6. 向量、原文片段和 documentId 一起写入本实验独立的 Milvus 集合。
         run.touched=true;run.index.addWithEmbeddings(chunks,vectors);
         // 7. 为前端准备每个点的预览：只取前 8 维，完整向量不展示。

@@ -340,6 +340,8 @@ function highlights(trace) {
   } else if(trace.node==='rerank'){
     const c=card(`按相关性重排 · ${out.model || ''}`);
     c.append(para(`重排后保留 ${out.hits.length} 个片段。`));
+    out.hits.forEach((h,i)=>c.append(para(`${chunkInfo(h).label}：融合 #${out.before.findIndex(x=>x.id===h.id)+1} → 重排 #${i+1}`)));
+    c.append(para('核对首次申请条件与操作步骤是否排在退款到账、寄回物流等相近条款前；名次变化本身不代表效果提高。'));
     c.append(hitTable(out.hits,`${out.scoreType || '相关性'} 分数`));
     appendHitDetails(c,out.hits);
     const before=(out.before||[]).map(h=>h.id),after=(out.hits||[]).map(h=>h.id);

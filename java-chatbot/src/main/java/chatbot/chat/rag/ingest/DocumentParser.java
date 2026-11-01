@@ -75,7 +75,7 @@ public class DocumentParser {
                     requireMagic(startsWith(header, OLE_MAGIC));
                     yield parseDoc(path);
                 }
-                default -> parseText(path, header);
+                default -> parseText(path, header, extension.equals("md"));
             };
         } catch (InvalidPasswordException | EncryptedDocumentException e) {
             throw new RejectedDocument("不支持加密文档，请先解密后上传", e);
@@ -186,7 +186,7 @@ public class DocumentParser {
         }
     }
 
-    private List<ParsedSection> parseText(Path path, byte[] header) throws IOException {
+    private List<ParsedSection> parseText(Path path, byte[] header, boolean markdown) throws IOException {
         if (startsWith(header, "%PDF-".getBytes(StandardCharsets.US_ASCII))
                 || startsWith(header, OLE_MAGIC) || startsWith(header, new byte[]{'P', 'K', 3, 4})) {
             throw new RejectedDocument("文件内容与文本格式不匹配");
@@ -204,6 +204,14 @@ public class DocumentParser {
         if (text.length() > MAX_TEXT_CHARACTERS) textLimit();
         text = normalize(text);
         if (text.isBlank()) throw new RejectedDocument("文件未提取到文字");
+        if (markdown) {
+            SectionCollector collector = new SectionCollector();
+            for (String line : text.split("\\n")) {
+                if (line.matches("^#{1,6}\\s+.*")) collector.heading(line.replaceFirst("^#{1,6}\\s+", ""));
+                collector.append(line);
+            }
+            return collector.finish();
+        }
         return List.of(new ParsedSection(text, null, "正文"));
     }
 
