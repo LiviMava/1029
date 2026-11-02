@@ -1,0 +1,16 @@
+{
+  "skills": {
+    "policy-answer": "skills/policy-answer/SKILL.md"
+  },
+  "mcpServers": {
+    "local-rag": {
+      "script": "server.py",
+      "envFrom": [
+        "RAG_API_KEY"
+      ],
+      "expectedTools": [
+        "search_knowledge"
+      ]
+    }
+  }
+}
